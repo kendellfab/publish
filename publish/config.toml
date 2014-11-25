@@ -1,0 +1,6 @@
+port = 8181
+site = "KendellFabrici.us"
+admin = "admin"
+theme = "theme"
+sqlite = "publish.db"
+upload = "~/Desktop/uploads"
