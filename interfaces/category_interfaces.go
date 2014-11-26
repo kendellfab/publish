@@ -19,7 +19,6 @@ func NewDbCategoryRepo(db *sql.DB) domain.CategoryRepo {
 }
 
 func (repo *DbCategoryRepo) init() {
-	log.Println("Initializing category.")
 	exec := `CREATE TABLE "category" (
 "id" INTEGER PRIMARY KEY NOT NULL,
 "title" TEXT NOT NULL,

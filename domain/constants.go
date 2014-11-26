@@ -10,6 +10,9 @@ const (
 	DATE_STORAGE_FORMAT = "2006-01-02T15:04:05Z"
 	SLUG_SPACER         = "-"
 	ALREADY_EXISTS      = "already exists"
+	SESS_FLASH          = "flash"
+	FLASH_ERROR         = "error_flash"
+	FLASH_SUCCESS       = "success_flash"
 )
 
 func SerializeDate(input time.Time) string {
