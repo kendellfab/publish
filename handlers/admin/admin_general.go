@@ -3,6 +3,7 @@ package admin
 import (
 	"github.com/kendellfab/milo"
 	"github.com/kendellfab/publish/usecases"
+	"log"
 	"net/http"
 )
 
@@ -18,7 +19,7 @@ func NewAdminGeneral(base *AdminBase, rm usecases.RepoManager) AdminGeneral {
 
 func (a AdminGeneral) RegisterRoutes(app *milo.Milo) {
 	app.Route("/admin", []string{"Get"}, a.authMid(a.handleAdmin))
-	app.Route("/setup", []string{"Get"}, a.handleSetup)
+	app.Route("/setup", []string{"Get", "Post"}, a.handleSetup)
 	app.Route("/login", []string{"Get"}, a.handleLogin)
 	app.Route("/logout", []string{"Get"}, a.handleLogout)
 }
@@ -28,8 +29,13 @@ func (a AdminGeneral) handleAdmin(w http.ResponseWriter, r *http.Request) {
 }
 
 func (a AdminGeneral) handleSetup(w http.ResponseWriter, r *http.Request) {
-	// a.RenderMessage(w, r, "Setup")
-	a.RenderTemplates(w, r, nil, "setup.tpl")
+	if r.Method == "POST" {
+		r.ParseForm()
+		log.Println(r.Form)
+		a.RenderMessage(w, r, "Handling setup.")
+	} else {
+		a.RenderTemplates(w, r, nil, "setup.tpl")
+	}
 }
 
 func (a AdminGeneral) handleLogin(w http.ResponseWriter, r *http.Request) {

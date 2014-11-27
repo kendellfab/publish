@@ -31,8 +31,22 @@
                     <div class="panel-heading">
                         <h3 class="panel-title"><i class="fa fa-bar-chart-o fa-fw"></i> Setup</h3>
                     </div>
-                    <div class="panel-body">
-                        <div id="morris-area-chart"></div>
+                    <div style="padding: 10px;">
+                        <form role="form" method="POST" action="/setup">
+                            <div class="form-group">
+                                <label for="nameInput">Name</label>
+                                <input type="text" name="name" class="form-control" id="nameInput" placeholder="Enter Name">
+                            </div>
+                            <div class="form-group">
+                                <label for="emailInput">Email address</label>
+                                <input type="email" name="email" class="form-control" id="emailInput" placeholder="Enter Email">
+                            </div>
+                            <div class="form-group">
+                                <label for="passwordInput">Password</label>
+                                <input type="password" name="password" class="form-control" id="passwordInput" placeholder="Enter Password">
+                            </div>
+                            <button type="submit" class="btn btn-primary">Submit</button>
+                        </form>
                     </div>
                 </div>
             </div>
