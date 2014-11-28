@@ -1,6 +1,7 @@
 package admin
 
 import (
+	"github.com/gorilla/context"
 	"github.com/gorilla/sessions"
 	"github.com/kendellfab/milo"
 	"github.com/kendellfab/publish/domain"
@@ -21,6 +22,31 @@ func NewAdminBase(rend milo.Renderer, rm usecases.RepoManager, store sessions.St
 
 func (a AdminBase) authMid(fn http.HandlerFunc) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
+
+		sess, sessErr := a.store.Get(r, domain.SESS_AUTH_KEY)
+		if sessErr != nil {
+			a.setErrorFlash(w, r, sessErr.Error())
+			a.Redirect(w, r, "/login", http.StatusSeeOther)
+			return
+		}
+
+		id, idOk := sess.Values[domain.SESS_USER_ID]
+
+		if !idOk {
+			a.setErrorFlash(w, r, r.RequestURI+" requires authentication.")
+			a.Redirect(w, r, "/login", http.StatusSeeOther)
+			return
+		}
+
+		usr, usrErr := a.rm.UserRepo.FindByIdInt(id.(int64))
+		if usrErr != nil {
+			a.setErrorFlash(w, r, usrErr.Error())
+			a.Redirect(w, r, "/login", http.StatusSeeOther)
+			return
+		}
+
+		context.Set(r, domain.CONTEXT_USER, usr)
+
 		fn(w, r)
 	}
 }
@@ -53,4 +79,26 @@ func (a AdminBase) setFlashMessage(w http.ResponseWriter, r *http.Request, key, 
 		sess.AddFlash(message, key)
 		sess.Save(r, w)
 	}
+}
+
+func (a AdminBase) doLogin(user *domain.User, w http.ResponseWriter, r *http.Request) error {
+	sess, sessErr := a.store.Get(r, domain.SESS_AUTH_KEY)
+	if sessErr != nil {
+		return sessErr
+	}
+	sess.Values[domain.SESS_USER_ID] = user.Id
+	sess.Values[domain.SESS_LOGGED_IN] = true
+	sess.Options.MaxAge = 60 * 60 * 2
+	sess.Save(r, w)
+	return nil
+}
+
+func (a AdminBase) doLogout(w http.ResponseWriter, r *http.Request) error {
+	sess, sessErr := a.store.Get(r, domain.SESS_AUTH_KEY)
+	if sessErr != nil {
+		return sessErr
+	}
+	sess.Options.MaxAge = -1
+	sess.Save(r, w)
+	return nil
 }

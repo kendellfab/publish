@@ -30,7 +30,7 @@ func (repo *DbCategoryRepo) init() {
 }
 
 func (repo *DbCategoryRepo) Store(category *domain.Category) error {
-	dateStr := category.Created.Format(domain.DATE_STORAGE_FORMAT)
+	dateStr := category.Created.Format(time.RFC3339)
 	sql := "INSERT INTO category(title, created) VALUES(?, ?)"
 	_, err := repo.db.Exec(sql, category.Title, dateStr)
 	return err
@@ -49,7 +49,7 @@ func (repo *DbCategoryRepo) FindById(id int) (*domain.Category, error) {
 		// 	repo.logger.LogError(scanErr)
 		// 	return nil, scanErr
 		// }
-		date, _ := time.Parse(domain.DATE_STORAGE_FORMAT, dateStr)
+		date, _ := time.Parse(time.RFC3339, dateStr)
 		category.Created = date
 		return &category, nil
 	} else {
@@ -63,7 +63,7 @@ func (repo *DbCategoryRepo) FindByTitle(title string) (*domain.Category, error) 
 	row := repo.db.QueryRow("SELECT id, title, created FROM category WHERE title=?", title)
 	scanErr := row.Scan(&category.Id, &category.Title, &dateStr)
 	if scanErr == nil {
-		date, _ := time.Parse(domain.DATE_STORAGE_FORMAT, dateStr)
+		date, _ := time.Parse(time.RFC3339, dateStr)
 		category.Created = date
 		return &category, nil
 	} else {
@@ -116,7 +116,7 @@ func scanCategory(rows *sql.Rows) []domain.Category {
 		var dateStr string
 		scanErr := rows.Scan(&category.Id, &category.Title, &dateStr)
 		if scanErr == nil {
-			date, _ := time.Parse(domain.DATE_STORAGE_FORMAT, dateStr)
+			date, _ := time.Parse(time.RFC3339, dateStr)
 			category.Created = date
 			cats = append(cats, category)
 		}

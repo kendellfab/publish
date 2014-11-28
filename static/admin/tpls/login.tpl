@@ -40,11 +40,21 @@
                         </div>
                     {{ end }}
 
-                    <form role="form" method="POST" action="/setup">
-                        <div class="form-group">
-                            <label for="nameInput">Name</label>
-                            <input type="text" name="name" class="form-control" id="nameInput" placeholder="Enter Name">
+                    {{ range $i, $v := .error_flash }}
+                        <div class="alert alert-danger alert-dismissable">
+                            <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
+                            {{ $v }}
                         </div>
+                    {{ end }}
+
+                    {{ range $i, $v := .success_flash }}
+                        <div class="alert alert-success alert-dismissable">
+                            <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
+                            {{ $v }}
+                        </div>
+                    {{ end }}
+
+                    <form role="form" method="POST" action="/login">
                         <div class="form-group">
                             <label for="emailInput">Email address</label>
                             <input type="email" name="email" class="form-control" id="emailInput" placeholder="Enter Email">

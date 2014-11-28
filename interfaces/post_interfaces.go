@@ -122,11 +122,11 @@ func (repo *DbPostRepo) Delete(id int) error {
 
 func (repo *DbPostRepo) scanPost(rows *sql.Rows) []domain.Post {
 	posts := make([]domain.Post, 0)
-	authors := make(map[int]domain.User)
+	authors := make(map[int64]domain.User)
 	cats := make(map[int]domain.Category)
 	for {
 		var post domain.Post
-		var authorId int
+		var authorId int64
 		var createString string
 		var tagsString string
 		var published int
@@ -155,7 +155,7 @@ func (repo *DbPostRepo) scanPost(rows *sql.Rows) []domain.Post {
 				}
 			}
 
-			post.Created, _ = time.Parse(domain.DATE_STORAGE_FORMAT, createString)
+			post.Created, _ = time.Parse(time.RFC3339, createString)
 			post.Published = false
 			if published == 1 {
 				post.Published = true

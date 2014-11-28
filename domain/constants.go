@@ -5,22 +5,24 @@ import (
 	"time"
 )
 
-// Mon Jan 2 15:04:05 -0700 MST 2006
 const (
-	DATE_STORAGE_FORMAT = "2006-01-02T15:04:05Z"
-	SLUG_SPACER         = "-"
-	ALREADY_EXISTS      = "already exists"
-	SESS_FLASH          = "flash"
-	FLASH_ERROR         = "error_flash"
-	FLASH_SUCCESS       = "success_flash"
+	SLUG_SPACER    = "-"
+	ALREADY_EXISTS = "already exists"
+	SESS_AUTH_KEY  = "sess_auth_key"
+	SESS_USER_ID   = "sess_user_id"
+	SESS_LOGGED_IN = "sess_logged_in"
+	SESS_FLASH     = "flash"
+	FLASH_ERROR    = "error_flash"
+	FLASH_SUCCESS  = "success_flash"
+	CONTEXT_USER   = "cntxt_user"
 )
 
 func SerializeDate(input time.Time) string {
-	return input.Format(DATE_STORAGE_FORMAT)
+	return input.Format(time.RFC3339)
 }
 
 func DeserializeDate(input string) (time.Time, error) {
-	return time.Parse(DATE_STORAGE_FORMAT, input)
+	return time.Parse(time.RFC3339, input)
 }
 
 func SerializeTags(input []string) (string, error) {

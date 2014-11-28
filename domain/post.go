@@ -22,7 +22,7 @@ type Post struct {
 	Title       string    `json:"title"`
 	Slug        string    `json:"slug"`
 	Author      User      `json:"author"`
-	AuthorId    int       `json:"authorId"`
+	AuthorId    int64     `json:"authorId"`
 	Created     time.Time `json:"created"`
 	Content     string    `json:"content"`
 	ContentType string    `json:"content_type"`

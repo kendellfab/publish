@@ -107,7 +107,7 @@ func (repo *DbPageRepo) parseRows(rows *sql.Rows) []domain.Page {
 		scanErr := rows.Scan(&page.Id, &page.Title, &page.Slug, &createdStr, &page.Content, &published)
 
 		if scanErr == nil {
-			date, _ := time.Parse(domain.DATE_STORAGE_FORMAT, createdStr)
+			date, _ := time.Parse(time.RFC3339, createdStr)
 			page.Created = date
 			page.Published = false
 			if published == 1 {
@@ -136,7 +136,7 @@ func (repo *DbPageRepo) parseRow(row *sql.Row) (*domain.Page, error) {
 		return nil, scanErr
 	}
 
-	date, _ := time.Parse(domain.DATE_STORAGE_FORMAT, createdStr)
+	date, _ := time.Parse(time.RFC3339, createdStr)
 	page.Created = date
 	page.Published = false
 	if published == 1 {

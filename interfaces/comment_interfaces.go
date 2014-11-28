@@ -87,7 +87,7 @@ func scanComments(rows *sql.Rows) []domain.Comment {
 			comment.Approved = true
 		}
 		if scanErr == nil {
-			comment.Date, _ = time.Parse(domain.DATE_STORAGE_FORMAT, date)
+			comment.Date, _ = time.Parse(time.RFC3339, date)
 			comments = append(comments, comment)
 		}
 

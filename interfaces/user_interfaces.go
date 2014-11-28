@@ -24,7 +24,6 @@ func (repo *DbUserRepo) init() {
 "name" TEXT NOT NULL,
 "email" TEXT NOT NULL,
 "password" TEXT NOT NULL,
-"salt" TEXT NOT NULL,
 "role" TEXT NOT NULL
 )`
 
@@ -37,7 +36,14 @@ func (repo *DbUserRepo) init() {
 func (repo *DbUserRepo) Store(user *domain.User) error {
 	// repo.logger.Log("Storing user: " + user.Email + " " + user.Name)
 	insertStmt := "INSERT INTO user(name, email, password, role) VALUES(?, ?, ?, ?)"
-	_, err := repo.db.Exec(insertStmt, user.Name, user.Email, user.Password, user.Role)
+	res, err := repo.db.Exec(insertStmt, user.Name, user.Email, user.Password, user.Role)
+
+	if err == nil {
+		if id, idErr := res.LastInsertId(); idErr == nil {
+			user.Id = id
+		}
+	}
+
 	return err
 }
 
@@ -52,7 +58,7 @@ func (repo *DbUserRepo) FindById(id string) (*domain.User, error) {
 	return &user, nil
 }
 
-func (repo *DbUserRepo) FindByIdInt(id int) (*domain.User, error) {
+func (repo *DbUserRepo) FindByIdInt(id int64) (*domain.User, error) {
 	var user domain.User
 	row := repo.db.QueryRow("SELECT * FROM user WHERE id=?", id)
 	scanErr := row.Scan(&user.Id, &user.Name, &user.Email, &user.Password, &user.Role)
@@ -74,7 +80,7 @@ func (repo *DbUserRepo) FindByEmail(email string) (*domain.User, error) {
 }
 
 func (repo *DbUserRepo) FindAdmin() (*[]domain.User, error) {
-	rows, rowError := repo.db.Query("SELECT id, name, email, salt, role FROM user WHERE role=?", domain.ROLE_ADMIN)
+	rows, rowError := repo.db.Query("SELECT id, name, email, salt, role FROM user WHERE role=?", domain.Admin)
 	if rowError != nil {
 		return nil, rowError
 	}
