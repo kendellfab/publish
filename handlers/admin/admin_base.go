@@ -63,6 +63,10 @@ func (a AdminBase) RenderTemplates(w http.ResponseWriter, r *http.Request, data 
 		sess.Save(r, w)
 	}
 
+	if usr, ok := context.GetOk(r, domain.CONTEXT_USER); ok {
+		data[domain.CONTEXT_USER] = usr
+	}
+
 	a.Renderer.RenderTemplates(w, r, data, tpls...)
 }
 

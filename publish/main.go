@@ -45,13 +45,17 @@ func main() {
 
 	adminBase := admin.NewAdminBase(adminRender, repoManager, store)
 	adminGen := admin.NewAdminGeneral(&adminBase, repoManager)
+	adminPosts := admin.NewAdminPost(&adminBase, repoManager)
+	adminCat := admin.NewAdminCat(&adminBase, repoManager)
 
 	frontBase := front.NewFrontBase(frontendRender, repoManager)
 
 	app := milo.NewMiloApp(milo.SetPort(config.Port))
 
 	adminGen.RegisterRoutes(app)
+	adminPosts.RegisterRoutes(app)
 	frontBase.RegisterRoutes(app)
+	adminCat.RegisterRoutes(app)
 
 	app.RouteAssetStripPrefix("/admin", config.AdminDir)
 	app.RouteAsset("/css", config.ThemeDir)
