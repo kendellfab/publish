@@ -1,4 +1,4 @@
-var pubApp = angular.module("pubApp", ["ngResource"]).config(function($interpolateProvider) {
+var pubApp = angular.module("pubApp", ["ngResource", "ui.ace"]).config(function($interpolateProvider) {
 	$interpolateProvider.startSymbol('||');
 	$interpolateProvider.endSymbol('||');
 });

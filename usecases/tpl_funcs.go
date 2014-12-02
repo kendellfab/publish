@@ -1,6 +1,8 @@
 package usecases
 
 import (
+	"github.com/russross/blackfriday"
+	"html/template"
 	"time"
 )
 
@@ -15,4 +17,8 @@ func FormatBool(input bool) string {
 		return "Yes"
 	}
 	return "No"
+}
+
+func RenderMarkdown(input string) template.HTML {
+	return template.HTML(blackfriday.MarkdownCommon([]byte(input)))
 }

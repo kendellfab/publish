@@ -4,7 +4,8 @@
 	<div class="col-lg-9">
 		<h3>Edit Post</h3>
 		<input type="text" ng-model="post.title" class="form-control" />
-		<textarea ng-model="post.content" cols="80" rows="15"></textarea>
+		<br />
+		<div ui-ace ng-model="post.content"></div>
 	</div>
 	<div class="col-lg-3">
 		<button ng-click="savePost();" type="submit" class="btn btn-primary">Save</button>
@@ -26,7 +27,9 @@
 	var backend = {};
 	backend.post = {{ marshal .post }};
 </script>
+<script src="/admin/js/ace-builds/src-min-noconflict/ace.js"></script>
 <script src="/admin/js/angular.js"></script>
+<script src="/admin/js/ui-ace.js"></script>
 <script src="/admin/js/angular-resource.js"></script>
 <script src="/admin/js/apps/publishApp.js"></script>
 <script src="/admin/js/apps/editApp.js"></script>

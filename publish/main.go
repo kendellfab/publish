@@ -42,6 +42,7 @@ func main() {
 	adminRender := milo.NewDefaultRenderer(filepath.Join(config.AdminDir, "tpls"), false, nil)
 	adminRender.RegisterTemplateFunc("fmt_date", usecases.FormatDate)
 	adminRender.RegisterTemplateFunc("fmt_bool", usecases.FormatBool)
+	adminRender.RegisterTemplateFunc("rend_md", usecases.RenderMarkdown)
 
 	frontendRender := milo.NewDefaultRenderer(filepath.Join(config.ThemeDir, "tpls"), false, nil)
 	store := sessions.NewCookieStore([]byte(config.SessionKeys[0]))
