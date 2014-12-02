@@ -40,6 +40,9 @@ func main() {
 	repoManager.PageRepo = interfaces.NewDbPageRepo(db)
 
 	adminRender := milo.NewDefaultRenderer(filepath.Join(config.AdminDir, "tpls"), false, nil)
+	adminRender.RegisterTemplateFunc("fmt_date", usecases.FormatDate)
+	adminRender.RegisterTemplateFunc("fmt_bool", usecases.FormatBool)
+
 	frontendRender := milo.NewDefaultRenderer(filepath.Join(config.ThemeDir, "tpls"), false, nil)
 	store := sessions.NewCookieStore([]byte(config.SessionKeys[0]))
 

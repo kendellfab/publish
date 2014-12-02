@@ -106,3 +106,9 @@ func (a AdminBase) doLogout(w http.ResponseWriter, r *http.Request) error {
 	sess.Save(r, w)
 	return nil
 }
+
+func (a AdminBase) setupActive(active string) map[string]interface{} {
+	res := make(map[string]interface{})
+	res[domain.ACTIVE] = active
+	return res
+}

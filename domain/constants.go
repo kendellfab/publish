@@ -6,6 +6,7 @@ import (
 )
 
 const (
+	ACTIVE         = "active"
 	SLUG_SPACER    = "-"
 	ALREADY_EXISTS = "already exists"
 	SESS_AUTH_KEY  = "sess_auth_key"

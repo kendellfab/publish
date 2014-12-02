@@ -8,7 +8,8 @@ import (
 type PostRepo interface {
 	Store(post *Post) error
 	Update(post *Post) error
-	FindById(id int) (*Post, error)
+	FindById(id int64) (*Post, error)
+	FindByIdString(id string) (*Post, error)
 	FindBySlug(slug string) (*Post, error)
 	FindByCategory(category *Category) (*[]Post, error)
 	FindAll() (*[]Post, error)
@@ -18,7 +19,7 @@ type PostRepo interface {
 }
 
 type Post struct {
-	Id          int       `json:"id"`
+	Id          int64     `json:"id"`
 	Title       string    `json:"title"`
 	Slug        string    `json:"slug"`
 	Author      User      `json:"author"`

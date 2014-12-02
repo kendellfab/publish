@@ -26,7 +26,7 @@ func (a AdminGeneral) RegisterRoutes(app *milo.Milo) {
 }
 
 func (a AdminGeneral) handleAdmin(w http.ResponseWriter, r *http.Request) {
-	a.RenderTemplates(w, r, nil, "base.tpl", "index.tpl")
+	a.RenderTemplates(w, r, a.setupActive("dashboard"), "base.tpl", "index.tpl")
 }
 
 func (a AdminGeneral) handleSetup(w http.ResponseWriter, r *http.Request) {

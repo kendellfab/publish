@@ -58,7 +58,14 @@ func (repo *DbPostRepo) Store(post *domain.Post) error {
 func (repo *DbPostRepo) Update(post *domain.Post) error {
 	tags, _ := domain.SerializeTags(post.Tags)
 	sql := "UPDATE post SET title=?, slug=?, content=?, type=?, tags=?, category=? WHERE id = ?"
-	_, err := repo.db.Exec(sql, post.Title, post.Slug, post.Content, post.ContentType, tags, post.Category.Id, post.Id)
+	res, err := repo.db.Exec(sql, post.Title, post.Slug, post.Content, post.ContentType, tags, post.Category.Id, post.Id)
+
+	if err == nil {
+		if id, idErr := res.LastInsertId(); idErr == nil {
+			post.Id = id
+		}
+	}
+
 	return err
 }
 
@@ -74,7 +81,17 @@ func (repo *DbPostRepo) UnPublish(id int) error {
 	return err
 }
 
-func (repo *DbPostRepo) FindById(id int) (*domain.Post, error) {
+func (repo *DbPostRepo) FindById(id int64) (*domain.Post, error) {
+	sql := "SELECT id, title, slug, author, created, content, type, published, tags, category FROM post WHERE id=?"
+	rows, qError := repo.db.Query(sql, id)
+	if qError != nil {
+		return nil, qError
+	}
+	posts := repo.scanPost(rows)
+	return &posts[0], nil
+}
+
+func (repo *DbPostRepo) FindByIdString(id string) (*domain.Post, error) {
 	sql := "SELECT id, title, slug, author, created, content, type, published, tags, category FROM post WHERE id=?"
 	rows, qError := repo.db.Query(sql, id)
 	if qError != nil {
