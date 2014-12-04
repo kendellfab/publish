@@ -51,7 +51,7 @@ func (repo *DbPostRepo) Store(post *domain.Post) error {
 	createdStr := domain.SerializeDate(post.Created)
 	tagsStr, _ := domain.SerializeTags(post.Tags)
 	authorId := post.AuthorId
-	res, err := repo.db.Exec("INSERT INTO post(title, slug, author, created, content, type, published, tags, category, day, month, year) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);", post.Title, post.Slug, authorId, createdStr, post.Content, post.ContentType, published, tagsStr, post.Category.Id, day, month, year)
+	res, err := repo.db.Exec("INSERT INTO post(title, slug, author, created, content, type, published, tags, category, day, month, year) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);", post.Title, post.Slug, authorId, createdStr, post.Content, post.ContentType, published, tagsStr, 0, day, month, year)
 	if err == nil {
 		if id, idErr := res.LastInsertId(); idErr == nil {
 			post.Id = id

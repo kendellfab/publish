@@ -25,5 +25,11 @@ func (f FrontBase) RenderTemplates(w http.ResponseWriter, r *http.Request, data 
 }
 
 func (f FrontBase) handleRoot(w http.ResponseWriter, r *http.Request) {
-	f.RenderTemplates(w, r, nil, "base.tpl", "index.tpl")
+	posts, err := f.rm.PostRepo.FindAll()
+	data := make(map[string]interface{})
+	data["posts"] = posts
+	if err != nil {
+		data["error"] = err
+	}
+	f.RenderTemplates(w, r, data, "base.tpl", "index.tpl")
 }
