@@ -4,9 +4,14 @@ var pubApp = angular.module("pubApp", ["ngResource", "ui.ace"]).config(function(
 });
 
 pubApp.factory('res', ['$resource', function($resource){
-	var postResource = $resource("/admin/post/:id/edit", {id: "@id"}, {
+	var postResource = $resource("/admin/post/:id/:action", {id: "@id"}, {
 		update: {
-			method: "Post"
+			method: "Post",
+			params: {action: "edit"}
+		},
+		publish: {
+			method: "Post",
+			params: {action: "publish"}
 		}
 	});
 

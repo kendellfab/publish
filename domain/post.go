@@ -14,8 +14,8 @@ type PostRepo interface {
 	FindByCategory(category *Category) (*[]Post, error)
 	FindAll() (*[]Post, error)
 	Delete(id int) error
-	Publish(id int) error
-	UnPublish(id int) error
+	Publish(id int64) error
+	UnPublish(id int64) error
 }
 
 type Post struct {
@@ -29,7 +29,7 @@ type Post struct {
 	ContentType string    `json:"content_type"`
 	Published   bool      `json:"published"`
 	Tags        []string  `json:"tags"`
-	Category    Category  `json:"category"`
+	Category    *Category `json:"category"`
 	Comments    []Comment `json:"comments"`
 }
 

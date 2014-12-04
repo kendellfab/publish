@@ -51,31 +51,35 @@ func (repo *DbPostRepo) Store(post *domain.Post) error {
 	createdStr := domain.SerializeDate(post.Created)
 	tagsStr, _ := domain.SerializeTags(post.Tags)
 	authorId := post.AuthorId
-	_, err := repo.db.Exec("INSERT INTO post(title, slug, author, created, content, type, published, tags, category, day, month, year) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);", post.Title, post.Slug, authorId, createdStr, post.Content, post.ContentType, published, tagsStr, post.Category.Id, day, month, year)
+	res, err := repo.db.Exec("INSERT INTO post(title, slug, author, created, content, type, published, tags, category, day, month, year) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);", post.Title, post.Slug, authorId, createdStr, post.Content, post.ContentType, published, tagsStr, post.Category.Id, day, month, year)
+	if err == nil {
+		if id, idErr := res.LastInsertId(); idErr == nil {
+			post.Id = id
+		}
+	}
 	return err
 }
 
 func (repo *DbPostRepo) Update(post *domain.Post) error {
 	tags, _ := domain.SerializeTags(post.Tags)
 	sql := "UPDATE post SET title=?, slug=?, content=?, type=?, tags=?, category=? WHERE id = ?"
-	res, err := repo.db.Exec(sql, post.Title, post.Slug, post.Content, post.ContentType, tags, post.Category.Id, post.Id)
-
-	if err == nil {
-		if id, idErr := res.LastInsertId(); idErr == nil {
-			post.Id = id
-		}
+	catId := 0
+	if post.Category != nil {
+		log.Println(*(post.Category))
+		catId = post.Category.Id
 	}
+	_, err := repo.db.Exec(sql, post.Title, post.Slug, post.Content, post.ContentType, tags, catId, post.Id)
 
 	return err
 }
 
-func (repo *DbPostRepo) Publish(id int) error {
+func (repo *DbPostRepo) Publish(id int64) error {
 	sql := "UPDATE post SET published = 1 WHERE id = ?"
 	_, err := repo.db.Exec(sql, id)
 	return err
 }
 
-func (repo *DbPostRepo) UnPublish(id int) error {
+func (repo *DbPostRepo) UnPublish(id int64) error {
 	sql := "UPDATE post SET published = 0 WHERE id = ?"
 	_, err := repo.db.Exec(sql, id)
 	return err
@@ -140,7 +144,7 @@ func (repo *DbPostRepo) Delete(id int) error {
 func (repo *DbPostRepo) scanPost(rows *sql.Rows) []domain.Post {
 	posts := make([]domain.Post, 0)
 	authors := make(map[int64]domain.User)
-	cats := make(map[int]domain.Category)
+	cats := make(map[int]*domain.Category)
 	for {
 		var post domain.Post
 		var authorId int64
@@ -167,8 +171,10 @@ func (repo *DbPostRepo) scanPost(rows *sql.Rows) []domain.Post {
 			} else {
 				cat, err := repo.catRepo.FindById(categoryId)
 				if err == nil {
-					post.Category = *cat
-					cats[categoryId] = *cat
+					post.Category = cat
+					cats[categoryId] = cat
+				} else {
+					post.Category = nil
 				}
 			}
 

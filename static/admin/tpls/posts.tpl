@@ -14,7 +14,7 @@
 					<div class="form-group">
 						<input type="text" name="title" class="form-control" placeholder="Post Title" />
 					</div>
-					<button type="submit" class="btn btn-primary">Start</button>
+					<button type="submit" class="btn btn-primary">Save</button>
 				</form>
 			</div>
 		</div>
@@ -31,6 +31,7 @@
 						<th>Title</th>
 						<th>Author</th>
 						<th>Created</th>
+						<th>Category</th>
 						<th>Published</th>
 						<th>Edit</th>
 					</tr>
@@ -41,6 +42,7 @@
 							<td>{{ .Title }}</td>
 							<td>{{ .Author.Name }}</td>
 							<td>{{ fmt_date .Created }}</td>
+							<td>{{ if .Category }}{{ .Category.Title }}{{ end }}</td>
 							<td>{{ fmt_bool .Published }}</td>
 							<td><a href="/admin/post/{{ .Id }}/edit">Edit</a></td>
 						</tr>

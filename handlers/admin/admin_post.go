@@ -27,6 +27,7 @@ func (a AdminPost) RegisterRoutes(app *milo.Milo) {
 	app.Route("/admin/posts", []string{"Get"}, a.authMid(a.handlePosts))
 	app.Route("/admin/post/{id:[0-9]+}/edit", []string{"Get"}, a.authMid(a.handleEditPost))
 	app.Route("/admin/post/{id:[0-9]+}/edit", []string{"Post"}, a.authMid(a.handleUpdatePost))
+	app.Route("/admin/post/{id:[0-9]+}/publish", []string{"Post"}, a.authMid(a.handlePublishPost))
 	app.Route("/admin/post/start", []string{"Post"}, a.authMid(a.handleStartPost))
 }
 
@@ -53,6 +54,13 @@ func (a AdminPost) handleEditPost(w http.ResponseWriter, r *http.Request) {
 		data["error"] = err
 	}
 
+	cats, cErr := a.rm.CategoryRepo.GetAll()
+	if cErr == nil {
+		data["cats"] = cats
+	} else {
+		log.Println(cErr)
+	}
+
 	a.RenderTemplates(w, r, data, "base.tpl", "edit_post.tpl")
 }
 
@@ -72,6 +80,33 @@ func (a AdminPost) handleUpdatePost(w http.ResponseWriter, r *http.Request) {
 	}
 
 	a.RenderMessage(w, r, "Post Updated")
+}
+
+func (a AdminPost) handlePublishPost(w http.ResponseWriter, r *http.Request) {
+	var post domain.Post
+	dec := json.NewDecoder(r.Body)
+	decErr := dec.Decode(&post)
+	if decErr != nil {
+		a.RenderError(w, r, 500, decErr.Error())
+		return
+	}
+
+	if post.Published {
+		pubErr := a.rm.PostRepo.Publish(post.Id)
+		if pubErr != nil {
+			a.RenderError(w, r, 500, pubErr.Error())
+			return
+		}
+		a.RenderMessage(w, r, "Post published")
+		return
+	}
+
+	unPubErr := a.rm.PostRepo.UnPublish(post.Id)
+	if unPubErr != nil {
+		a.RenderError(w, r, 500, unPubErr.Error())
+		return
+	}
+	a.RenderMessage(w, r, "Post unpublished.")
 }
 
 func (a AdminPost) handleStartPost(w http.ResponseWriter, r *http.Request) {
