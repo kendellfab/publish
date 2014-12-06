@@ -1,0 +1,62 @@
+// +build !mysql
+
+package interfaces
+
+var CREATE_COMMENT = `CREATE TABLE comment (
+"id" INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+"page" VARCHAR(256) NOT NULL,
+"username" VARCHAR(64),
+"email" VARCHAR(64),
+"date" VARCHAR(64),
+"content" TEXT,
+"approved" INTEGER DEFAULT (0),
+"day" INTEGER, 
+"month" INTEGER, 
+"year" INTEGER)`
+
+var CREATE_USER = `CREATE TABLE "user" (
+"id" INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+"name" TEXT NOT NULL,
+"email" TEXT NOT NULL,
+"password" TEXT NOT NULL,
+"role" TEXT NOT NULL
+)`
+
+var CREATE_CATEGORY = `CREATE TABLE "category" (
+"id" INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+"title" TEXT NOT NULL,
+"slug" TEXT NOT NULL,
+"created" TEXT
+)`
+
+var CREATE_POST = `CREATE TABLE post (
+"id" INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+"title" TEXT NOT NULL,
+"slug" TEXT NOT NULL,
+"author" INTEGER NOT NULL,
+"created" TEXT NOT NULL,
+"content" TEXT NOT NULL,
+"type" TEXT,
+"published" INTEGER,
+"tags" TEXT,
+"category" INTEGER,
+"day" INTEGER,
+"month" INTEGER,
+"year" INTEGER
+)`
+
+var CREATE_CONTACT = `CREATE TABLE contact (
+"id" INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+"name" TEXT NOT NULL,
+"email" TEXT NOT NULL,
+"message" TEXT NOT NULL,
+"read" INTEGER)`
+
+var CREATE_PAGE = `CREATE TABLE "page" (
+"id" INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+"title" TEXT NOT NULL,
+"slug" TEXT NOT NULL,
+"created" TEXT NOT NULL,
+"content" TEXT NOT NULL,
+"published" INTEGER
+)`

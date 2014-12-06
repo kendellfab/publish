@@ -19,19 +19,8 @@ func NewDbCommentRepo(db *sql.DB) domain.CommentRepo {
 }
 
 func (repo *DbCommentRepo) init() {
-	exec := `CREATE TABLE comment (
-"id" INTEGER NOT NULL,
-"page" VARCHAR(256) NOT NULL,
-"username" VARCHAR(64),
-"email" VARCHAR(64),
-"date" VARCHAR(64),
-"content" TEXT,
-"approved" INTEGER DEFAULT (0),
-"day" INTEGER, 
-"month" INTEGER, 
-"year" INTEGER)`
 
-	if _, err := repo.db.Exec(exec); err != nil && !strings.Contains(err.Error(), domain.ALREADY_EXISTS) {
+	if _, err := repo.db.Exec(CREATE_COMMENT); err != nil && !strings.Contains(err.Error(), domain.ALREADY_EXISTS) {
 		log.Fatal(err)
 	}
 }

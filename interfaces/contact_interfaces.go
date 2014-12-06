@@ -18,14 +18,7 @@ func NewDbContactRepo(db *sql.DB) domain.ContactRepo {
 }
 
 func (repo *DbContactRepo) init() {
-	exec := `CREATE TABLE contact (
-"id" INTEGER NOT NULL,
-"name" TEXT NOT NULL,
-"email" TEXT NOT NULL,
-"message" TEXT NOT NULL,
-"read" INTEGER)`
-
-	if _, err := repo.db.Exec(exec); err != nil && !strings.Contains(err.Error(), domain.ALREADY_EXISTS) {
+	if _, err := repo.db.Exec(CREATE_CONTACT); err != nil && !strings.Contains(err.Error(), domain.ALREADY_EXISTS) {
 		log.Fatal(err)
 	}
 }

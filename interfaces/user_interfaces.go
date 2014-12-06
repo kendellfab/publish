@@ -19,18 +19,9 @@ func NewDbUserRepo(db *sql.DB) domain.UserRepo {
 }
 
 func (repo *DbUserRepo) init() {
-	exec := `CREATE TABLE "user" (
-"id" INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
-"name" TEXT NOT NULL,
-"email" TEXT NOT NULL,
-"password" TEXT NOT NULL,
-"role" TEXT NOT NULL
-)`
-
-	if _, err := repo.db.Exec(exec); err != nil && !strings.Contains(err.Error(), domain.ALREADY_EXISTS) {
+	if _, err := repo.db.Exec(CREATE_USER); err != nil && !strings.Contains(err.Error(), domain.ALREADY_EXISTS) {
 		log.Fatal(err)
 	}
-
 }
 
 func (repo *DbUserRepo) Store(user *domain.User) error {

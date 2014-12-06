@@ -1,7 +1,8 @@
 package main
 
 import (
-	_ "code.google.com/p/go-sqlite/go1/sqlite3"
+	_ "github.com/go-sql-driver/mysql"
+	// _ "code.google.com/p/go-sqlite/go1/sqlite3"
 	"database/sql"
 	"flag"
 	"github.com/BurntSushi/toml"
@@ -26,7 +27,8 @@ func main() {
 		log.Fatal(tomlErr)
 	}
 
-	db, dbErr := sql.Open("sqlite3", config.Sqlite)
+	// db, dbErr := sql.Open("sqlite3", config.Sqlite)
+	db, dbErr := sql.Open("mysql", "publish:publish@/publish")
 	if dbErr != nil {
 		log.Fatal(dbErr)
 	}

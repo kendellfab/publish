@@ -19,13 +19,7 @@ func NewDbCategoryRepo(db *sql.DB) domain.CategoryRepo {
 }
 
 func (repo *DbCategoryRepo) init() {
-	exec := `CREATE TABLE "category" (
-"id" INTEGER PRIMARY KEY NOT NULL,
-"title" TEXT NOT NULL,
-"slug" TEXT NOT NULL,
-"created" TEXT
-)`
-	if _, err := repo.db.Exec(exec); err != nil && !strings.Contains(err.Error(), domain.ALREADY_EXISTS) {
+	if _, err := repo.db.Exec(CREATE_CATEGORY); err != nil && !strings.Contains(err.Error(), domain.ALREADY_EXISTS) {
 		log.Fatal(err)
 	}
 }

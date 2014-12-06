@@ -21,23 +21,7 @@ func NewDbPostRepo(db *sql.DB, ar domain.UserRepo, cr domain.CategoryRepo) domai
 }
 
 func (repo *DbPostRepo) init() {
-	exec := `CREATE TABLE post (
-"id" INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
-"title" TEXT NOT NULL,
-"slug" TEXT NOT NULL,
-"author" INTEGER NOT NULL,
-"created" TEXT NOT NULL,
-"content" TEXT NOT NULL,
-"type" TEXT,
-"published" INTEGER,
-"tags" TEXT,
-"category" INTEGER,
-"day" INTEGER,
-"month" INTEGER,
-"year" INTEGER
-)`
-
-	if _, err := repo.db.Exec(exec); err != nil && !strings.Contains(err.Error(), domain.ALREADY_EXISTS) {
+	if _, err := repo.db.Exec(CREATE_POST); err != nil && !strings.Contains(err.Error(), domain.ALREADY_EXISTS) {
 		log.Fatal(err)
 	}
 }

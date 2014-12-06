@@ -19,15 +19,7 @@ func NewDbPageRepo(db *sql.DB) domain.PageRepo {
 }
 
 func (repo *DbPageRepo) init() {
-	exec := `CREATE TABLE "page" (
-"id" INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
-"title" TEXT NOT NULL,
-"slug" TEXT NOT NULL,
-"created" TEXT NOT NULL,
-"content" TEXT NOT NULL,
-"published" INTEGER
-)`
-	if _, err := repo.db.Exec(exec); err != nil && !strings.Contains(err.Error(), domain.ALREADY_EXISTS) {
+	if _, err := repo.db.Exec(CREATE_PAGE); err != nil && !strings.Contains(err.Error(), domain.ALREADY_EXISTS) {
 		log.Fatal(err)
 	}
 }
