@@ -1,6 +1,7 @@
 package domain
 
 import (
+	"fmt"
 	"strings"
 	"time"
 )
@@ -11,8 +12,9 @@ type PostRepo interface {
 	FindById(id int64) (*Post, error)
 	FindByIdString(id string) (*Post, error)
 	FindBySlug(slug string) (*Post, error)
-	FindByCategory(category *Category) (*[]Post, error)
-	FindAll() (*[]Post, error)
+	FindByCategory(category *Category) ([]*Post, error)
+	FindAll() ([]*Post, error)
+	FindPublished(offset, limit int) ([]*Post, error)
 	Delete(id int) error
 	Publish(id int64) error
 	UnPublish(id int64) error
@@ -40,4 +42,12 @@ func (p *Post) GenerateSlug() {
 		slug = strings.ToLower(slug)
 		p.Slug = slug
 	}
+}
+
+func (p Post) Description() string {
+	return p.Content
+}
+
+func (p Post) Permalink() string {
+	return fmt.Sprintf("/%d/%d/%s", p.Created.Year(), p.Created.Month(), p.Slug)
 }

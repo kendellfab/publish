@@ -29,7 +29,7 @@
         <div class="col-lg-6 col-lg-offset-3">
             <div class="panel panel-default">
                 <div class="panel-heading">
-                    <h3 class="panel-title"><i class="fa fa-bar-chart-o fa-fw"></i> Setup</h3>
+                    <h3 class="panel-title"><i class="fa fa-bar-chart-o fa-fw"></i> Login</h3>
                 </div>
                 <div style="padding: 10px;">
 

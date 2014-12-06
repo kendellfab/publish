@@ -1,7 +1,7 @@
 port = 8181
 site = "KendellFabrici.us"
 admin = "../static/admin"
-theme = "../static/theme"
+theme = "../static/hyde-x"
 sqlite = "publish.db"
 upload = "~/Desktop/uploads"
 session = ["ADF@#$123Mdskoek"]

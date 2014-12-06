@@ -92,7 +92,7 @@ func (repo *DbPostRepo) FindById(id int64) (*domain.Post, error) {
 		return nil, qError
 	}
 	posts := repo.scanPost(rows)
-	return &posts[0], nil
+	return posts[0], nil
 }
 
 func (repo *DbPostRepo) FindByIdString(id string) (*domain.Post, error) {
@@ -102,7 +102,7 @@ func (repo *DbPostRepo) FindByIdString(id string) (*domain.Post, error) {
 		return nil, qError
 	}
 	posts := repo.scanPost(rows)
-	return &posts[0], nil
+	return posts[0], nil
 }
 
 func (repo *DbPostRepo) FindBySlug(slug string) (*domain.Post, error) {
@@ -112,27 +112,37 @@ func (repo *DbPostRepo) FindBySlug(slug string) (*domain.Post, error) {
 		return nil, qError
 	}
 	posts := repo.scanPost(rows)
-	return &posts[0], nil
+	return posts[0], nil
 }
 
-func (repo *DbPostRepo) FindByCategory(category *domain.Category) (*[]domain.Post, error) {
+func (repo *DbPostRepo) FindByCategory(category *domain.Category) ([]*domain.Post, error) {
 	sql := "SELECT id, title, slug, author, created, content, type, published, tags, category FROM post WHERE category=?"
 	rows, qError := repo.db.Query(sql, category.Id)
 	if qError != nil {
 		return nil, qError
 	}
 	posts := repo.scanPost(rows)
-	return &posts, nil
+	return posts, nil
 }
 
-func (repo *DbPostRepo) FindAll() (*[]domain.Post, error) {
+func (repo *DbPostRepo) FindAll() ([]*domain.Post, error) {
 	sql := "SELECT id, title, slug, author, created, content, type, published, tags, category FROM post"
 	rows, qError := repo.db.Query(sql)
 	if qError != nil {
 		return nil, qError
 	}
 	posts := repo.scanPost(rows)
-	return &posts, nil
+	return posts, nil
+}
+
+func (repo *DbPostRepo) FindPublished(offset, limit int) ([]*domain.Post, error) {
+	sel := "SELECT id, title, slug, author, created, content, type, published, tags, category FROM post WHERE published = 1 ORDER BY created DESC LIMIT ? OFFSET ?;"
+	rows, qError := repo.db.Query(sel, limit, offset)
+	if qError != nil {
+		return nil, qError
+	}
+	posts := repo.scanPost(rows)
+	return posts, nil
 }
 
 func (repo *DbPostRepo) Delete(id int) error {
@@ -141,8 +151,8 @@ func (repo *DbPostRepo) Delete(id int) error {
 	return err
 }
 
-func (repo *DbPostRepo) scanPost(rows *sql.Rows) []domain.Post {
-	posts := make([]domain.Post, 0)
+func (repo *DbPostRepo) scanPost(rows *sql.Rows) []*domain.Post {
+	posts := make([]*domain.Post, 0)
 	authors := make(map[int64]domain.User)
 	cats := make(map[int]*domain.Category)
 	for {
@@ -183,7 +193,7 @@ func (repo *DbPostRepo) scanPost(rows *sql.Rows) []domain.Post {
 			if published == 1 {
 				post.Published = true
 			}
-			posts = append(posts, post)
+			posts = append(posts, &post)
 		}
 
 		if !rows.Next() {

@@ -22,6 +22,7 @@ func (repo *DbCategoryRepo) init() {
 	exec := `CREATE TABLE "category" (
 "id" INTEGER PRIMARY KEY NOT NULL,
 "title" TEXT NOT NULL,
+"slug" TEXT NOT NULL,
 "created" TEXT
 )`
 	if _, err := repo.db.Exec(exec); err != nil && !strings.Contains(err.Error(), domain.ALREADY_EXISTS) {
@@ -31,16 +32,19 @@ func (repo *DbCategoryRepo) init() {
 
 func (repo *DbCategoryRepo) Store(category *domain.Category) error {
 	dateStr := category.Created.Format(time.RFC3339)
-	sql := "INSERT INTO category(title, created) VALUES(?, ?)"
-	_, err := repo.db.Exec(sql, category.Title, dateStr)
+	if category.Slug == "" {
+		category.GenerateSlug()
+	}
+	sql := "INSERT INTO category(title, slug, created) VALUES(?, ?, ?)"
+	_, err := repo.db.Exec(sql, category.Title, category.Slug, dateStr)
 	return err
 }
 
 func (repo *DbCategoryRepo) FindById(id int) (*domain.Category, error) {
 	var category domain.Category
 	var dateStr string
-	row := repo.db.QueryRow("SELECT id, title, created FROM category WHERE id=?", id)
-	scanErr := row.Scan(&category.Id, &category.Title, &dateStr)
+	row := repo.db.QueryRow("SELECT id, title, slug, created FROM category WHERE id=?", id)
+	scanErr := row.Scan(&category.Id, &category.Title, &category.Slug, &dateStr)
 	if scanErr == nil {
 		// switch {
 		// case scanErr == sql.ErrNoRows:
@@ -60,8 +64,8 @@ func (repo *DbCategoryRepo) FindById(id int) (*domain.Category, error) {
 func (repo *DbCategoryRepo) FindByTitle(title string) (*domain.Category, error) {
 	var category domain.Category
 	var dateStr string
-	row := repo.db.QueryRow("SELECT id, title, created FROM category WHERE title=?", title)
-	scanErr := row.Scan(&category.Id, &category.Title, &dateStr)
+	row := repo.db.QueryRow("SELECT id, title, slug, created FROM category WHERE title=?", title)
+	scanErr := row.Scan(&category.Id, &category.Title, &category.Slug, &dateStr)
 	if scanErr == nil {
 		date, _ := time.Parse(time.RFC3339, dateStr)
 		category.Created = date
@@ -72,7 +76,7 @@ func (repo *DbCategoryRepo) FindByTitle(title string) (*domain.Category, error) 
 }
 
 func (repo *DbCategoryRepo) GetAll() (*[]domain.Category, error) {
-	rows, rowError := repo.db.Query("SELECT id, title, created FROM category")
+	rows, rowError := repo.db.Query("SELECT id, title, slug, created FROM category")
 	if rowError != nil {
 		return nil, rowError
 	}
@@ -87,7 +91,7 @@ func (repo *DbCategoryRepo) DeleteById(id int) error {
 }
 
 func (repo *DbCategoryRepo) GetCategoryPostCount() (*[]domain.CategoryCount, error) {
-	sql := `select c.title, count(*)
+	sql := `select c.title, c.slug, count(*)
 from post p
 join category c on p.category = c.id
 group by category;`
@@ -98,7 +102,7 @@ group by category;`
 	counts := make([]domain.CategoryCount, 0)
 	for {
 		var count domain.CategoryCount
-		scanErr := row.Scan(&count.Title, &count.Count)
+		scanErr := row.Scan(&count.Title, &count.Slug, &count.Count)
 		if scanErr == nil {
 			counts = append(counts, count)
 		}
@@ -114,7 +118,7 @@ func scanCategory(rows *sql.Rows) []domain.Category {
 	for {
 		var category domain.Category
 		var dateStr string
-		scanErr := rows.Scan(&category.Id, &category.Title, &dateStr)
+		scanErr := rows.Scan(&category.Id, &category.Title, &category.Slug, &dateStr)
 		if scanErr == nil {
 			date, _ := time.Parse(time.RFC3339, dateStr)
 			category.Created = date
