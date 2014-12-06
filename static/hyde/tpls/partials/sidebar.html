@@ -1,0 +1,26 @@
+<div class="sidebar">
+  <div class="container sidebar-sticky">
+    <div class="sidebar-about">
+      {{ with .Site.Params.gravatarHash }}<img src="http://www.gravatar.com/avatar/{{ . }}?s=200" alt="gravatar">{{ end }}
+      <h1>Kendell Fabricius</h1>
+      <p class="lead">My development ramblings.</p>
+    </div>
+
+    <ul class="sidebar-nav">
+      <li class="sidebar-nav-item"><a href="{{ .Site.BaseUrl }}/">Blog</a></li>
+      {{ range .Counts }}
+      <li class="sidebar-nav-item"><a href="/category/{{ .Slug }}">{{ .Title }} ({{ .Count }})</a></li>
+      {{ end }}
+    </ul>
+
+    <ul class="sidebar-nav">
+      <li class="sidebar-nav-item"><a href="http://github.com/kendellfab">GitHub</a></li>
+      {{ with .Site.Params.linkedin }}<li class="sidebar-nav-item"><a href="{{ . }}">LinkedIn</a></li>{{ end }}
+      {{ with .Site.Params.googleplus }}<li class="sidebar-nav-item"><a href="{{ . }}">Google+</a></li>{{ end }}
+      {{ with .Site.Params.facebook }}<li class="sidebar-nav-item"><a href="{{ . }}">Facebook</a></li>{{ end }}
+      {{ with .Site.Params.twitter }}<li class="sidebar-nav-item"><a href="{{ . }}">Twitter</a></li>{{ end }}
+    </ul>
+
+    <p>Copyright &copy; {{ .Now.Format "2006" }}</p>
+  </div>
+</div>

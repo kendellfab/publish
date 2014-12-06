@@ -94,6 +94,7 @@ func (repo *DbCategoryRepo) GetCategoryPostCount() (*[]domain.CategoryCount, err
 	sql := `select c.title, c.slug, count(*)
 from post p
 join category c on p.category = c.id
+where p.published = 1
 group by category;`
 	row, qError := repo.db.Query(sql)
 	if qError != nil {
