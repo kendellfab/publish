@@ -9,7 +9,7 @@
 	<div class="col-lg-9">
 		<input type="text" ng-model="post.title" class="form-control" />
 		<br />
-		<div ui-ace ng-model="post.content"></div>
+		<div ui-ace="{useWrapMode: true, mode: 'markdown'}" ng-model="post.content"></div>
 	</div>
 	<div class="col-lg-3">
 		<button ng-click="savePost();" type="submit" style="width: 100%;" class="btn btn-primary">Save</button>

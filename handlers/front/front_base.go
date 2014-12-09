@@ -2,18 +2,21 @@ package front
 
 import (
 	"github.com/kendellfab/milo"
+	"github.com/kendellfab/publish/domain"
 	"github.com/kendellfab/publish/usecases"
 	"log"
 	"net/http"
+	"time"
 )
 
 type FrontBase struct {
 	milo.Renderer
-	rm usecases.RepoManager
+	rm     usecases.RepoManager
+	config domain.Config
 }
 
-func NewFrontBase(rend milo.Renderer, rm usecases.RepoManager) FrontBase {
-	base := FrontBase{Renderer: rend, rm: rm}
+func NewFrontBase(rend milo.Renderer, rm usecases.RepoManager, c domain.Config) FrontBase {
+	base := FrontBase{Renderer: rend, rm: rm, config: c}
 	return base
 }
 
@@ -22,10 +25,12 @@ func (f FrontBase) RegisterRoutes(app *milo.Milo) {
 }
 
 func (f FrontBase) RenderTemplates(w http.ResponseWriter, r *http.Request, data map[string]interface{}, tpls ...string) {
-	counts, countErr := f.rm.CategoryRepo.GetCategoryPostCount()
-	if countErr == nil {
-		data["Counts"] = counts
+	if data == nil {
+		data = make(map[string]interface{})
 	}
+	payStart := time.Now()
+	data["payload"] = f.rm.PayloadRepo.GetPayload()
+	log.Println(time.Since(payStart))
 	f.Renderer.RenderTemplates(w, r, data, tpls...)
 }
 

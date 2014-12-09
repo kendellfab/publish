@@ -69,43 +69,31 @@ func (repo *DbCategoryRepo) FindByTitle(title string) (*domain.Category, error) 
 	}
 }
 
-func (repo *DbCategoryRepo) GetAll() (*[]domain.Category, error) {
-	rows, rowError := repo.db.Query("SELECT id, title, slug, created FROM category")
-	if rowError != nil {
-		return nil, rowError
+func (repo *DbCategoryRepo) GetAll() ([]*domain.Category, error) {
+	rows, qError := repo.db.Query("SELECT c.id, c.title, c.slug, c.created, count(*) FROM post p join category c on p.category = c.id where p.published = 1 group by category;")
+	if qError != nil {
+		return nil, qError
 	}
-	cats := scanCategory(rows)
-	return &cats, nil
+	cats := make([]*domain.Category, 0)
+	for {
+		var cat domain.Category
+		var created string
+		scanErr := rows.Scan(&cat.Id, &cat.Title, &cat.Slug, &created, &cat.Count)
+		if scanErr == nil {
+			cat.Created, _ = time.Parse(time.RFC3339, created)
+			cats = append(cats, &cat)
+		}
+		if !rows.Next() {
+			break
+		}
+	}
+	return cats, nil
 }
 
 func (repo *DbCategoryRepo) DeleteById(id int) error {
 	sql := "DELETE FROM category WHERE id = ?"
 	_, err := repo.db.Exec(sql, id)
 	return err
-}
-
-func (repo *DbCategoryRepo) GetCategoryPostCount() (*[]domain.CategoryCount, error) {
-	sql := `select c.title, c.slug, count(*)
-from post p
-join category c on p.category = c.id
-where p.published = 1
-group by category;`
-	row, qError := repo.db.Query(sql)
-	if qError != nil {
-		return nil, qError
-	}
-	counts := make([]domain.CategoryCount, 0)
-	for {
-		var count domain.CategoryCount
-		scanErr := row.Scan(&count.Title, &count.Slug, &count.Count)
-		if scanErr == nil {
-			counts = append(counts, count)
-		}
-		if !row.Next() {
-			break
-		}
-	}
-	return &counts, nil
 }
 
 func scanCategory(rows *sql.Rows) []domain.Category {

@@ -36,7 +36,9 @@ func (f FrontPosts) handlePost(w http.ResponseWriter, r *http.Request) {
 	if err == nil {
 		data["Post"] = post
 	} else {
-		data["PostError"] = err
+		// data["PostError"] = err
+		f.RenderError(w, r, 500, err.Error())
+		return
 	}
 	f.RenderTemplates(w, r, data, "post.html")
 }

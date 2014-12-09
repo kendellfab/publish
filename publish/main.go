@@ -1,8 +1,8 @@
 package main
 
 import (
-	_ "github.com/go-sql-driver/mysql"
-	// _ "code.google.com/p/go-sqlite/go1/sqlite3"
+	// _ "github.com/go-sql-driver/mysql"
+	_ "code.google.com/p/go-sqlite/go1/sqlite3"
 	"database/sql"
 	"flag"
 	"github.com/BurntSushi/toml"
@@ -18,6 +18,7 @@ import (
 )
 
 func main() {
+	log.Println("Starting publish...")
 	var configPath = flag.String("c", "config.toml", "Set the config path.")
 	flag.Parse()
 
@@ -27,8 +28,8 @@ func main() {
 		log.Fatal(tomlErr)
 	}
 
-	// db, dbErr := sql.Open("sqlite3", config.Sqlite)
-	db, dbErr := sql.Open("mysql", "publish:publish@/publish")
+	db, dbErr := sql.Open("sqlite3", config.Sqlite)
+	// db, dbErr := sql.Open("mysql", "publish:publish@/publish")
 	if dbErr != nil {
 		log.Fatal(dbErr)
 	}
@@ -40,6 +41,7 @@ func main() {
 	repoManager.PostRepo = interfaces.NewDbPostRepo(db, repoManager.UserRepo, repoManager.CategoryRepo)
 	repoManager.ContactRepo = interfaces.NewDbContactRepo(db)
 	repoManager.PageRepo = interfaces.NewDbPageRepo(db)
+	repoManager.PayloadRepo = interfaces.NewPayloadRepo(config, repoManager.CategoryRepo, repoManager.PostRepo)
 
 	adminRender := milo.NewDefaultRenderer(filepath.Join(config.AdminDir, "tpls"), false, nil)
 	adminRender.RegisterTemplateFunc("fmt_date", usecases.FormatDate)
@@ -58,7 +60,7 @@ func main() {
 	adminPosts := admin.NewAdminPost(&adminBase, repoManager)
 	adminCat := admin.NewAdminCat(&adminBase, repoManager)
 
-	frontBase := front.NewFrontBase(frontendRender, repoManager)
+	frontBase := front.NewFrontBase(frontendRender, repoManager, config)
 	frontPosts := front.NewFrontPosts(&frontBase)
 	frontCategories := front.NewFrontCategories(&frontBase)
 
