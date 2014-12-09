@@ -46,6 +46,9 @@ func (p *Post) GenerateSlug() {
 }
 
 func (p Post) Description() string {
+	if len(p.Content) > 150 {
+		return p.Content[0:150]
+	}
 	return p.Content
 }
 

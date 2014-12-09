@@ -21,10 +21,24 @@ func (f FrontCategories) RegisterRoutes(app *milo.Milo) {
 }
 
 func (f FrontCategories) handleCategories(w http.ResponseWriter, r *http.Request) {
-
+	f.RenderTemplates(w, r, nil, "categories.html")
 }
 
 func (f FrontCategories) handleCategory(w http.ResponseWriter, r *http.Request) {
 	slug := mux.Vars(r)["slug"]
-	w.Write([]byte(slug))
+	data := make(map[string]interface{})
+	cat, err := f.rm.CategoryRepo.FindBySlug(slug)
+	if err == nil {
+		data["category"] = cat
+		posts, pErr := f.rm.PostRepo.FindByCategory(cat)
+		if pErr == nil {
+			data["posts"] = posts
+		} else {
+			data["error"] = pErr
+		}
+	} else {
+		data["error"] = err
+	}
+
+	f.RenderTemplates(w, r, data, "category.html")
 }

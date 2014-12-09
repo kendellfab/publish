@@ -69,6 +69,20 @@ func (repo *DbCategoryRepo) FindByTitle(title string) (*domain.Category, error) 
 	}
 }
 
+func (repo *DbCategoryRepo) FindBySlug(slug string) (*domain.Category, error) {
+	var category domain.Category
+	var dateStr string
+	row := repo.db.QueryRow("SELECT id, title, slug, created FROM category WHERE slug=?", slug)
+	scanErr := row.Scan(&category.Id, &category.Title, &category.Slug, &dateStr)
+	if scanErr == nil {
+		date, _ := time.Parse(time.RFC3339, dateStr)
+		category.Created = date
+		return &category, nil
+	} else {
+		return nil, scanErr
+	}
+}
+
 func (repo *DbCategoryRepo) GetAll() ([]*domain.Category, error) {
 	rows, qError := repo.db.Query("SELECT c.id, c.title, c.slug, c.created, count(*) FROM post p join category c on p.category = c.id where p.published = 1 group by category;")
 	if qError != nil {

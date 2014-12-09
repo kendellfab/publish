@@ -9,6 +9,7 @@ type CategoryRepo interface {
 	Store(category *Category) error
 	FindById(id int) (*Category, error)
 	FindByTitle(title string) (*Category, error)
+	FindBySlug(slug string) (*Category, error)
 	GetAll() ([]*Category, error)
 	DeleteById(id int) error
 }

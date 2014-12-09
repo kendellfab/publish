@@ -1,0 +1,18 @@
+{{ partial "head.html" . }}
+<div class="content container">
+	<h1>{{ .category.Title }}</h1>
+	<hr />
+	<div class="posts">
+		{{ range .posts }}
+		    <div class="post">
+		      <h2 class="post-title">
+		        <a href="{{ .Permalink }}">{{ .Title }}</a>
+		      </h2>
+		      <span class="post-date">{{ .Created.Format "Jan 2, 2006 15:04:05" }} &middot; <a href="/category/{{ .Category.Slug }}">{{ .Category.Title }}</a></span>
+		      <p>{{ rend_md .Description }}</p>
+		      <a href="{{ .Permalink }}">Read On &rarr;</a>
+		    </div>
+	    {{ end }}
+	</div>
+</div>
+{{ partial "foot.html" . }}
