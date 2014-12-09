@@ -31,6 +31,7 @@ func (f FrontBase) RenderTemplates(w http.ResponseWriter, r *http.Request, data 
 	payStart := time.Now()
 	data["payload"] = f.rm.PayloadRepo.GetPayload()
 	log.Println(time.Since(payStart))
+	data["Now"] = time.Now()
 	f.Renderer.RenderTemplates(w, r, data, tpls...)
 }
 

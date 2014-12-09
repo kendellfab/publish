@@ -8,8 +8,12 @@ import (
 
 // Mon Jan 2 15:04:05 MST 2006
 
-func FormatDate(input time.Time) string {
-	return input.Format("Mon Jan 2, 2006")
+func FormatDate(input time.Time, fmts ...string) string {
+	format := "Mon Jan 2, 2006"
+	if len(fmts) > 0 {
+		format = fmts[0]
+	}
+	return input.Format(format)
 }
 
 func FormatBool(input bool) string {

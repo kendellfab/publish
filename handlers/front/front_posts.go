@@ -1,9 +1,12 @@
 package front
 
 import (
+	"fmt"
 	"github.com/gorilla/mux"
 	"github.com/kendellfab/milo"
+	"github.com/kendellfab/publish/domain"
 	"net/http"
+	"time"
 )
 
 type FrontPosts struct {
@@ -22,11 +25,37 @@ func (f FrontPosts) RegisterRoutes(app *milo.Milo) {
 }
 
 func (f FrontPosts) handleYear(w http.ResponseWriter, r *http.Request) {
-
+	year := mux.Vars(r)["year"]
+	now := time.Now()
+	series := make(map[time.Time][]*domain.Post)
+	for i := 1; i <= int(now.Month()); i++ {
+		when, _ := time.Parse("2006-1", fmt.Sprintf("%s-%d", year, i))
+		if posts, pErr := f.rm.PostRepo.FindByYearMonth(year, fmt.Sprintf("%d", i)); pErr == nil {
+			series[when] = posts
+		}
+	}
+	data := make(map[string]interface{})
+	data["series"] = series
+	f.RenderTemplates(w, r, data, "time_series.html")
 }
 
+// Mon Jan 2 15:04:05 MST 2006
 func (f FrontPosts) handleMonth(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	year := vars["year"]
+	month := vars["month"]
 
+	when, _ := time.Parse("2006-01", fmt.Sprintf("%s-%s", year, month))
+
+	posts, pErr := f.rm.PostRepo.FindByYearMonth(year, month)
+	series := make(map[time.Time][]*domain.Post)
+	series[when] = posts
+
+	data := make(map[string]interface{})
+	data["series"] = series
+	data["error"] = pErr
+
+	f.RenderTemplates(w, r, data, "time_series.html")
 }
 
 func (f FrontPosts) handlePost(w http.ResponseWriter, r *http.Request) {
