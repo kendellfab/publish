@@ -39,6 +39,7 @@ func main() {
 	repoManager.ContactRepo = interfaces.NewDbContactRepo(db)
 	repoManager.PageRepo = interfaces.NewDbPageRepo(db)
 	repoManager.PayloadRepo = interfaces.NewPayloadRepo(config, repoManager.CategoryRepo, repoManager.PostRepo)
+	repoManager.ViewRepo = interfaces.NewDbViewRepo(db)
 
 	adminRender := milo.NewDefaultRenderer(filepath.Join(config.AdminDir, "tpls"), false, nil)
 	adminRender.RegisterTemplateFunc("fmt_date", usecases.FormatDate)
