@@ -139,6 +139,16 @@ func (repo *DbPostRepo) FindByYearMonth(year, month string) ([]*domain.Post, err
 	return posts, nil
 }
 
+func (repo *DbPostRepo) FindDashboard(offset, limit int) ([]*domain.Post, error) {
+	sel := "SELECT id, title, slug, author, created, content, type, published, tags, category FROM post ORDER BY created DESC LIMIT ? OFFSET ?;"
+	rows, qError := repo.db.Query(sel, limit, offset)
+	if qError != nil {
+		return nil, qError
+	}
+	posts := repo.scanPost(rows)
+	return posts, nil
+}
+
 func (repo *DbPostRepo) Delete(id int) error {
 	sql := "DELETE FROM post WHERE id = ?"
 	_, err := repo.db.Exec(sql, id)

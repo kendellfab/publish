@@ -1,20 +1,23 @@
 {{ define "Content" }}
 <div class="row">
-	<div class="col-lg-8">
+	<div class="col-lg-4">
 		<h3>Posts</h3>
 		<p>All: {{ len .posts }}<p>
 	</div>
-	<div class="col-lg-4">
+	<div class="col-lg-8">
 		<div class="panel panel-default">
             <div class="panel-heading">
                 <h3 class="panel-title"><i class="fa fa-fw fa-file-text-o"></i> New Post</h3>
             </div>
             <div class="panel-body">
 				<form method="POST" action="/admin/post/start">
-					<div class="form-group">
-						<input type="text" name="title" class="form-control" placeholder="Post Title" />
-					</div>
-					<button type="submit" class="btn btn-primary">Save</button>
+					<div class="row">
+						<div class="col-lg-10">
+							<input type="text" name="title" class="form-control" placeholder="Post Title" />
+						</div>
+						<div class="col-lg-2">
+							<button type="submit" class="btn btn-primary">Save</button>
+						</div>
 				</form>
 			</div>
 		</div>

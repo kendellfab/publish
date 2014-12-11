@@ -4,10 +4,6 @@ import (
 	"golang.org/x/crypto/bcrypt"
 )
 
-const (
-	STRLEN = 15
-)
-
 type UserRepo interface {
 	Store(user *User) error
 	FindById(id string) (*User, error)

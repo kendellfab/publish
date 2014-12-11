@@ -29,12 +29,12 @@ func (repo *DbCategoryRepo) init() {
 	row := repo.db.QueryRow(countQ)
 	var count int
 	scanErr := row.Scan(&count)
-	if scanErr == nil || scanErr == sql.ErrNoRows || count == 0 {
+	if (scanErr == nil || scanErr == sql.ErrNoRows) && count == 0 {
 		log.Println("Setting up default category.")
 		uncategorized.Created = time.Now()
 		repo.Store(uncategorized)
-	} else {
-		log.Fatal(scanErr)
+	} else if scanErr != nil {
+		log.Fatal("Error", scanErr, "Count", count)
 	}
 }
 

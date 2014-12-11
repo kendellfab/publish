@@ -26,7 +26,16 @@ func (a AdminGeneral) RegisterRoutes(app *milo.Milo) {
 }
 
 func (a AdminGeneral) handleAdmin(w http.ResponseWriter, r *http.Request) {
-	a.RenderTemplates(w, r, a.setupActive("dashboard"), "base.tpl", "index.tpl")
+	data := make(map[string]interface{})
+	recent, recentErr := a.rm.PostRepo.FindDashboard(0, 10)
+	data["recent"] = recent
+	data["recent_error"] = recentErr
+
+	cats, catErr := a.rm.CategoryRepo.GetAllCount()
+	data["cats"] = cats
+	data["cats_error"] = catErr
+
+	a.RenderTemplates(w, r, data, "base.tpl", "index.tpl")
 }
 
 func (a AdminGeneral) handleSetup(w http.ResponseWriter, r *http.Request) {
