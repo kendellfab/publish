@@ -11,6 +11,7 @@ type CategoryRepo interface {
 	FindByTitle(title string) (*Category, error)
 	FindBySlug(slug string) (*Category, error)
 	GetAll() ([]*Category, error)
+	GetAllCount() ([]*Category, error)
 	DeleteById(id int) error
 }
 

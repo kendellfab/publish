@@ -35,7 +35,7 @@ func (repo *DbPostRepo) Store(post *domain.Post) error {
 	createdStr := domain.SerializeDate(post.Created)
 	tagsStr, _ := domain.SerializeTags(post.Tags)
 	authorId := post.AuthorId
-	res, err := repo.db.Exec("INSERT INTO post(title, slug, author, created, content, type, published, tags, category, day, month, year) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);", post.Title, post.Slug, authorId, createdStr, post.Content, post.ContentType, published, tagsStr, 0, day, month, year)
+	res, err := repo.db.Exec("INSERT INTO post(title, slug, author, created, content, type, published, tags, category, day, month, year) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);", post.Title, post.Slug, authorId, createdStr, post.Content, post.ContentType, published, tagsStr, 1, day, month, year)
 	if err == nil {
 		if id, idErr := res.LastInsertId(); idErr == nil {
 			post.Id = id
@@ -47,7 +47,7 @@ func (repo *DbPostRepo) Store(post *domain.Post) error {
 func (repo *DbPostRepo) Update(post *domain.Post) error {
 	tags, _ := domain.SerializeTags(post.Tags)
 	sql := "UPDATE post SET title=?, slug=?, content=?, type=?, tags=?, category=? WHERE id = ?"
-	catId := 0
+	catId := 1
 	if post.Category != nil {
 		log.Println(*(post.Category))
 		catId = post.Category.Id

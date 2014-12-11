@@ -29,7 +29,7 @@
 			</div>
 			<div class="panel-body">
 				<select ng-model="post.category" ng-options="c.title for c in cats track by c.id">
-					<option value="">-- choose category --</option>
+					
 				</select>
 			</div>
         </div>

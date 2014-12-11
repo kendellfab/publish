@@ -8,6 +8,8 @@ import (
 	"time"
 )
 
+var uncategorized = &domain.Category{Title: "Uncategorized", Slug: "uncategorized"}
+
 type DbCategoryRepo struct {
 	db *sql.DB
 }
@@ -21,6 +23,18 @@ func NewDbCategoryRepo(db *sql.DB) domain.CategoryRepo {
 func (repo *DbCategoryRepo) init() {
 	if _, err := repo.db.Exec(CREATE_CATEGORY); err != nil && !strings.Contains(err.Error(), domain.ALREADY_EXISTS) {
 		log.Fatal(err)
+	}
+
+	countQ := "SELECT count(*) FROM category;"
+	row := repo.db.QueryRow(countQ)
+	var count int
+	scanErr := row.Scan(&count)
+	if scanErr == nil || scanErr == sql.ErrNoRows || count == 0 {
+		log.Println("Setting up default category.")
+		uncategorized.Created = time.Now()
+		repo.Store(uncategorized)
+	} else {
+		log.Fatal(scanErr)
 	}
 }
 
@@ -40,13 +54,6 @@ func (repo *DbCategoryRepo) FindById(id int) (*domain.Category, error) {
 	row := repo.db.QueryRow("SELECT id, title, slug, created FROM category WHERE id=?", id)
 	scanErr := row.Scan(&category.Id, &category.Title, &category.Slug, &dateStr)
 	if scanErr == nil {
-		// switch {
-		// case scanErr == sql.ErrNoRows:
-		// 	return nil, scanErr
-		// case scanErr != nil:
-		// 	repo.logger.LogError(scanErr)
-		// 	return nil, scanErr
-		// }
 		date, _ := time.Parse(time.RFC3339, dateStr)
 		category.Created = date
 		return &category, nil
@@ -84,7 +91,16 @@ func (repo *DbCategoryRepo) FindBySlug(slug string) (*domain.Category, error) {
 }
 
 func (repo *DbCategoryRepo) GetAll() ([]*domain.Category, error) {
-	rows, qError := repo.db.Query("SELECT c.id, c.title, c.slug, c.created, count(*) FROM post p join category c on p.category = c.id where p.published = 1 group by category;")
+	rows, qError := repo.db.Query("SELECT id, title, slug, created FROM category")
+	if qError != nil {
+		return nil, qError
+	}
+	cats := repo.scanCategory(rows)
+	return cats, nil
+}
+
+func (repo *DbCategoryRepo) GetAllCount() ([]*domain.Category, error) {
+	rows, qError := repo.db.Query("SELECT c.id, c.title, c.slug, c.created, count(*) FROM category c join post p on p.category = c.id where p.published = 1 group by category;")
 	if qError != nil {
 		return nil, qError
 	}
@@ -110,8 +126,8 @@ func (repo *DbCategoryRepo) DeleteById(id int) error {
 	return err
 }
 
-func scanCategory(rows *sql.Rows) []domain.Category {
-	cats := make([]domain.Category, 0)
+func (repo *DbCategoryRepo) scanCategory(rows *sql.Rows) []*domain.Category {
+	cats := make([]*domain.Category, 0)
 	for {
 		var category domain.Category
 		var dateStr string
@@ -119,7 +135,7 @@ func scanCategory(rows *sql.Rows) []domain.Category {
 		if scanErr == nil {
 			date, _ := time.Parse(time.RFC3339, dateStr)
 			category.Created = date
-			cats = append(cats, category)
+			cats = append(cats, &category)
 		}
 		if !rows.Next() {
 			break

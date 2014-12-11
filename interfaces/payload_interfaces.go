@@ -25,7 +25,7 @@ func (p *PayloadRepoImpl) GetPayload() *domain.Payload {
 
 	go func(wait *sync.WaitGroup) {
 		defer wait.Done()
-		if cats, catErr := p.cr.GetAll(); catErr == nil {
+		if cats, catErr := p.cr.GetAllCount(); catErr == nil {
 			pay.Categories = cats
 		}
 	}(&wg)
