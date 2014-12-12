@@ -2,12 +2,12 @@
   <div class="container sidebar-sticky">
     <div class="sidebar-about">
       <img src="http://www.gravatar.com/avatar/d55c1faa59c2d1319225704bdffabe0d.png?s=200" alt="gravatar">
-      <h1>Kendell Fabricius</h1>
+      <a href="/"><h1>{{ .payload.Config.SiteName }}</h1></a>
       <p class="lead">My development ramblings.</p>
     </div>
 
     <ul class="sidebar-nav">
-      <li class="sidebar-nav-item"><a href="{{ .Site.BaseUrl }}/">Blog</a></li>
+      <!-- <li class="sidebar-nav-item"><a href="{{ .Site.BaseUrl }}/">Blog</a></li> -->
       {{ range .payload.Categories }}
       <li class="sidebar-nav-item"><a href="/category/{{ .Slug }}">{{ .Title }} ({{ .Count }})</a></li>
       {{ end }}
