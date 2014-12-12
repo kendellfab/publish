@@ -49,7 +49,6 @@ func (repo *DbPostRepo) Update(post *domain.Post) error {
 	sql := "UPDATE post SET title=?, slug=?, content=?, type=?, tags=?, category=? WHERE id = ?"
 	catId := 1
 	if post.Category != nil {
-		log.Println(*(post.Category))
 		catId = post.Category.Id
 	}
 	_, err := repo.db.Exec(sql, post.Title, post.Slug, post.Content, post.ContentType, tags, catId, post.Id)
@@ -100,7 +99,7 @@ func (repo *DbPostRepo) FindBySlug(slug string) (*domain.Post, error) {
 }
 
 func (repo *DbPostRepo) FindByCategory(category *domain.Category) ([]*domain.Post, error) {
-	sql := "SELECT id, title, slug, author, created, content, type, published, tags, category FROM post WHERE category=?"
+	sql := "SELECT id, title, slug, author, created, content, type, published, tags, category FROM post WHERE category=? AND published = 1;"
 	rows, qError := repo.db.Query(sql, category.Id)
 	if qError != nil {
 		return nil, qError

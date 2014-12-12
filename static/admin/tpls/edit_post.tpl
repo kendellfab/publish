@@ -13,6 +13,9 @@
 	</div>
 	<div class="col-lg-3">
 		<button ng-click="savePost();" type="submit" style="width: 100%;" class="btn btn-primary">Save</button>
+		<div ng-show="saving" class="save-indicator">
+			<img src="/admin/img/ajax-loader.gif" /> <span>Saving...</span>
+		</div>
 		<br />
 		<br />
 		<div class="panel panel-default">
