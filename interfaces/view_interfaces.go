@@ -5,6 +5,7 @@ import (
 	"github.com/kendellfab/publish/domain"
 	"log"
 	"strings"
+	"time"
 )
 
 type DbViewRepo struct {
@@ -24,7 +25,10 @@ func (repo *DbViewRepo) init() {
 }
 
 func (repo *DbViewRepo) Store(v *domain.View) error {
-	return nil
+	ins := "INSERT INTO view(who, at, type, target) VALUES(?, ?, ?, ?);"
+	at := v.At.Format(time.RFC3339)
+	_, err := repo.db.Exec(ins, v.Who, at, int(v.TargetType), v.Target)
+	return err
 }
 
 func (repo *DbViewRepo) GetType(t domain.TargetType) ([]*domain.View, error) {
@@ -32,5 +36,27 @@ func (repo *DbViewRepo) GetType(t domain.TargetType) ([]*domain.View, error) {
 }
 
 func (repo *DbViewRepo) GetTypeTarget(t domain.TargetType, target string) ([]*domain.View, error) {
-	return nil, nil
+	sel := "SELECT id, who, at, type, target FROM view WHERE type = ? AND target = ? ORDER BY at DESC;"
+	rows, qErr := repo.db.Query(sel, t, target)
+	if qErr != nil {
+		return nil, qErr
+	}
+	return repo.scanRows(rows)
+}
+
+func (repo *DbViewRepo) scanRows(rows *sql.Rows) ([]*domain.View, error) {
+	views := make([]*domain.View, 0)
+	for {
+		var view domain.View
+		var at string
+		sErr := rows.Scan(&view.Id, &view.Who, &at, &view.TargetType, &view.Target)
+		if sErr == nil {
+			view.At, _ = time.Parse(time.RFC3339, at)
+			views = append(views, &view)
+		}
+		if !rows.Next() {
+			break
+		}
+	}
+	return views, nil
 }

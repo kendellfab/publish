@@ -5,6 +5,7 @@ import (
 	"github.com/kendellfab/publish/domain"
 	"github.com/kendellfab/publish/usecases"
 	"log"
+	"net"
 	"net/http"
 	"time"
 )
@@ -44,4 +45,12 @@ func (f FrontBase) handleRoot(w http.ResponseWriter, r *http.Request) {
 		data["error"] = err
 	}
 	f.RenderTemplates(w, r, data, "index.html")
+}
+
+func (f FrontBase) getIp(r *http.Request) string {
+	if ipProxy := r.Header.Get("X-Real-IP"); len(ipProxy) > 0 {
+		return ipProxy
+	}
+	ip, _, _ := net.SplitHostPort(r.RemoteAddr)
+	return ip
 }

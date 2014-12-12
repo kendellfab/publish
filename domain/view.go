@@ -31,8 +31,8 @@ func (t TargetType) String() string {
 
 type View struct {
 	Id         int        `json:"id"`
-	From       string     `json:"from"`
-	When       time.Time  `json:"when"`
+	Who        string     `json:"who"`
+	At         time.Time  `json:"at"`
 	TargetType TargetType `json:"targetType"`
 	Target     string     `json:"target"`
 }
