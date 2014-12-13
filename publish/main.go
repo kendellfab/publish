@@ -26,13 +26,8 @@ func main() {
 		log.Fatal(tomlErr)
 	}
 
-	db, dbErr := infrastructure.ConnectDb(&config)
-	if dbErr != nil {
-		log.Fatal(dbErr)
-	}
+	db := infrastructure.ConnectDb(&config)
 	defer db.Close()
-	db.SetMaxIdleConns(5)
-	db.SetMaxOpenConns(10)
 
 	repoManager := usecases.RepoManager{}
 	repoManager.CommentRepo = interfaces.NewDbCommentRepo(db)

@@ -7,15 +7,20 @@ import (
 	"database/sql"
 	"errors"
 	"github.com/kendellfab/publish/domain"
+	"log"
 )
 
 func init() {
 	CurrentDb = DbSqlite
 }
 
-func ConnectDb(config *domain.Config) (*sql.DB, error) {
+func ConnectDb(config *domain.Config) *sql.DB {
 	if config == nil || config.Sqlite == nil {
-		return nil, errors.New("Publish: Database config required!")
+		log.Fatal(errors.New("Publish: Database config required!"))
 	}
-	return sql.Open("sqlite3", config.Sqlite.Path)
+	db, err := sql.Open("sqlite3", config.Sqlite.Path)
+	if err != nil {
+		log.Fatal(err)
+	}
+	return db
 }

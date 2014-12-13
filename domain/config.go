@@ -34,6 +34,8 @@ type ConfigMysql struct {
 	Db       string `toml:"db"`
 	Host     string `toml:"host"`
 	Port     int    `toml:"port"`
+	MaxIdle  int    `toml:"max_idle"`
+	MaxOpen  int    `tomel:"max_open"`
 }
 
 func (c *ConfigMysql) GetConnectionString() string {

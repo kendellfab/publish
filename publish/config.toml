@@ -13,3 +13,5 @@ path = "publish.db"
 username = "publish"
 password = "publish"
 db = "publish"
+max_idle = 5
+max_open = 10
