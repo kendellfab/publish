@@ -34,12 +34,6 @@ func main() {
 	db.SetMaxIdleConns(5)
 	db.SetMaxOpenConns(10)
 
-	// viewDb, vdbErr := infrastructure.ConnectDb(&config)
-	// if vdbErr != nil {
-	// 	log.Fatal(vdbErr)
-	// }
-	// defer viewDb.Close()
-
 	repoManager := usecases.RepoManager{}
 	repoManager.CommentRepo = interfaces.NewDbCommentRepo(db)
 	repoManager.UserRepo = interfaces.NewDbUserRepo(db)

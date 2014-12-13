@@ -70,32 +70,20 @@ func (repo *DbPostRepo) UnPublish(id int64) error {
 
 func (repo *DbPostRepo) FindById(id int64) (*domain.Post, error) {
 	sql := "SELECT id, title, slug, author, created, content, type, published, tags, category FROM post WHERE id=?"
-	rows, qError := repo.db.Query(sql, id)
-	if qError != nil {
-		return nil, qError
-	}
-	posts := repo.scanPost(rows)
-	return posts[0], nil
+	row := repo.db.QueryRow(sql, id)
+	return repo.scanPost(row)
 }
 
 func (repo *DbPostRepo) FindByIdString(id string) (*domain.Post, error) {
 	sql := "SELECT id, title, slug, author, created, content, type, published, tags, category FROM post WHERE id=?"
-	rows, qError := repo.db.Query(sql, id)
-	if qError != nil {
-		return nil, qError
-	}
-	posts := repo.scanPost(rows)
-	return posts[0], nil
+	row := repo.db.QueryRow(sql, id)
+	return repo.scanPost(row)
 }
 
 func (repo *DbPostRepo) FindBySlug(slug string) (*domain.Post, error) {
 	sql := "SELECT id, title, slug, author, created, content, type, published, tags, category FROM post WHERE slug=?"
-	rows, qError := repo.db.Query(sql, slug)
-	if qError != nil {
-		return nil, qError
-	}
-	posts := repo.scanPost(rows)
-	return posts[0], nil
+	row := repo.db.QueryRow(sql, slug)
+	return repo.scanPost(row)
 }
 
 func (repo *DbPostRepo) FindByCategory(category *domain.Category, offset, limit int) ([]*domain.Post, error) {
@@ -104,7 +92,7 @@ func (repo *DbPostRepo) FindByCategory(category *domain.Category, offset, limit 
 	if qError != nil {
 		return nil, qError
 	}
-	posts := repo.scanPost(rows)
+	posts := repo.scanPosts(rows)
 	return posts, nil
 }
 
@@ -114,7 +102,7 @@ func (repo *DbPostRepo) FindAll() ([]*domain.Post, error) {
 	if qError != nil {
 		return nil, qError
 	}
-	posts := repo.scanPost(rows)
+	posts := repo.scanPosts(rows)
 	return posts, nil
 }
 
@@ -124,7 +112,7 @@ func (repo *DbPostRepo) FindPublished(offset, limit int) ([]*domain.Post, error)
 	if qError != nil {
 		return nil, qError
 	}
-	posts := repo.scanPost(rows)
+	posts := repo.scanPosts(rows)
 	return posts, nil
 }
 
@@ -134,7 +122,7 @@ func (repo *DbPostRepo) FindByYearMonth(year, month string) ([]*domain.Post, err
 	if qError != nil {
 		return nil, qError
 	}
-	posts := repo.scanPost(rows)
+	posts := repo.scanPosts(rows)
 	return posts, nil
 }
 
@@ -144,7 +132,7 @@ func (repo *DbPostRepo) FindDashboard(offset, limit int) ([]*domain.Post, error)
 	if qError != nil {
 		return nil, qError
 	}
-	posts := repo.scanPost(rows)
+	posts := repo.scanPosts(rows)
 	return posts, nil
 }
 
@@ -176,7 +164,37 @@ func (repo *DbPostRepo) PublishedCountCategory(catId int) (int, error) {
 	return count, nil
 }
 
-func (repo *DbPostRepo) scanPost(rows *sql.Rows) []*domain.Post {
+func (repo *DbPostRepo) scanPost(row *sql.Row) (*domain.Post, error) {
+	var post domain.Post
+	var authorId int64
+	var createString string
+	var tagString string
+	var published int
+	var categoryId int
+	scanErr := row.Scan(&post.Id, &post.Title, &post.Slug, &authorId, &createString, &post.Content, &post.ContentType, &published, &tagString, &categoryId)
+	if scanErr != nil {
+		return nil, scanErr
+	}
+
+	if auth, aErr := repo.authorRepo.FindByIdInt(authorId); aErr == nil {
+		post.Author = *auth
+	}
+
+	if cat, cErr := repo.catRepo.FindById(categoryId); cErr == nil {
+		post.Category = cat
+	}
+
+	post.Created, _ = time.Parse(time.RFC3339, createString)
+	post.Published = false
+	if published == 1 {
+		post.Published = true
+	}
+
+	return &post, nil
+
+}
+
+func (repo *DbPostRepo) scanPosts(rows *sql.Rows) []*domain.Post {
 	posts := make([]*domain.Post, 0)
 	authors := make(map[int64]domain.User)
 	cats := make(map[int]*domain.Category)

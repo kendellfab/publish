@@ -1,4 +1,4 @@
-// +build mysql
+// +build !sqlite
 
 package infrastructure
 
