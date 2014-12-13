@@ -14,9 +14,6 @@ func GetPagination(r *http.Request, total, pageCount int) domain.Pagination {
 	if pStr, ok := r.Form["page"]; ok {
 		if pg, pgErr := strconv.Atoi(pStr[0]); pgErr == nil {
 			paginator.Offset = pg - 1
-			if paginator.Offset > 2 {
-				paginator.Offset = 0
-			}
 		}
 	}
 
@@ -25,7 +22,7 @@ func GetPagination(r *http.Request, total, pageCount int) domain.Pagination {
 		paginator.NewerIndex = paginator.Offset
 	}
 
-	if paginator.Offset*paginator.Count < total {
+	if (paginator.Offset+1)*paginator.Count < total {
 		paginator.HasOlder = true
 		paginator.OlderIndex = paginator.Offset + 2
 		if paginator.OlderIndex == 1 {

@@ -113,3 +113,20 @@ func TestPaginationAtThree(t *testing.T) {
 		t.Errorf("Offset Expected: %d got %d", 2, paginator.Offset)
 	}
 }
+
+func TestPaginationAtFull(t *testing.T) {
+	req, reqErr := http.NewRequest("GET", "/?page=2", nil)
+	if reqErr != nil {
+		t.Error(reqErr)
+	}
+	total := 10
+	perPage := 5
+
+	paginator := GetPagination(req, total, perPage)
+	if !paginator.HasNewer {
+		t.Error("Not exected to have newer.")
+	}
+	if paginator.HasOlder {
+		t.Error("Not expected to have older.")
+	}
+}
