@@ -16,7 +16,7 @@ import (
 )
 
 func main() {
-	log.Println("Starting publish...")
+	log.Println("Starting publish... DB:", infrastructure.CurrentDb)
 	var configPath = flag.String("c", "config.toml", "Set the config path.")
 	flag.Parse()
 
@@ -30,6 +30,15 @@ func main() {
 	if dbErr != nil {
 		log.Fatal(dbErr)
 	}
+	defer db.Close()
+	db.SetMaxIdleConns(5)
+	db.SetMaxOpenConns(10)
+
+	// viewDb, vdbErr := infrastructure.ConnectDb(&config)
+	// if vdbErr != nil {
+	// 	log.Fatal(vdbErr)
+	// }
+	// defer viewDb.Close()
 
 	repoManager := usecases.RepoManager{}
 	repoManager.CommentRepo = interfaces.NewDbCommentRepo(db)

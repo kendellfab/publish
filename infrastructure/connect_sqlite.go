@@ -9,6 +9,10 @@ import (
 	"github.com/kendellfab/publish/domain"
 )
 
+func init() {
+	CurrentDb = DbSqlite
+}
+
 func ConnectDb(config *domain.Config) (*sql.DB, error) {
 	if config == nil || config.Sqlite == nil {
 		return nil, errors.New("Publish: Database config required!")

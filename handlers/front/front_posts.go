@@ -63,13 +63,10 @@ func (f FrontPosts) handlePost(w http.ResponseWriter, r *http.Request) {
 	slug := mux.Vars(r)["slug"]
 
 	view := &domain.View{Who: f.getIp(r), At: time.Now(), TargetType: domain.TypePost, Target: slug}
-
-	go func() {
-		vErr := f.rm.ViewRepo.Store(view)
-		if vErr != nil {
-			log.Println(vErr)
-		}
-	}()
+	vErr := f.rm.ViewRepo.Store(view)
+	if vErr != nil {
+		log.Println(vErr)
+	}
 
 	post, err := f.rm.PostRepo.FindBySlug(slug)
 	data := make(map[string]interface{})

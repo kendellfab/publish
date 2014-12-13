@@ -3,7 +3,7 @@
 {{ with .Post }}
   <div class="post">
     <h1>{{ .Title }}</h1>
-    <span class="post-date">{{ .Created.Format "Jan 2, 2006" }} &middot; <a href="/category/{{ .Category.Slug }}">{{ .Category.Title }}</a></span>
+    <span class="post-date">{{ .Created.Format "Jan 2, 2006" }} {{ with .Category }}&middot; <a href="/category/{{ .Slug }}">{{ .Title }}</a>{{ end }}</span>
     {{ rend_md .Content }}
   </div>
 {{ else }}

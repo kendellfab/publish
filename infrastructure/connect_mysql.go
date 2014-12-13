@@ -9,6 +9,10 @@ import (
 	"github.com/kendellfab/publish/domain"
 )
 
+func init() {
+	CurrentDb = DbMysql
+}
+
 func ConnectDb(config *domain.Config) (*sql.DB, error) {
 	if config == nil || config.Mysql == nil {
 		return nil, errors.New("Publish: Database config required!")

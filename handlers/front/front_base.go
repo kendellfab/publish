@@ -7,20 +7,19 @@ import (
 	"log"
 	"net"
 	"net/http"
-	"strconv"
 	"time"
 )
 
 type FrontBase struct {
 	milo.Renderer
-	rm      usecases.RepoManager
-	config  domain.Config
-	perPage int
+	rm        usecases.RepoManager
+	config    domain.Config
+	pageCount int
 }
 
 func NewFrontBase(rend milo.Renderer, rm usecases.RepoManager, c domain.Config) FrontBase {
 	base := FrontBase{Renderer: rend, rm: rm, config: c}
-	base.perPage = c.PerPage
+	base.pageCount = c.PerPage
 	return base
 }
 
@@ -39,39 +38,14 @@ func (f FrontBase) RenderTemplates(w http.ResponseWriter, r *http.Request, data 
 	f.Renderer.RenderTemplates(w, r, data, tpls...)
 }
 
-func (f FrontBase) getPagination(r *http.Request, total int) domain.Pagination {
-	paginator := domain.Pagination{}
-	paginator.Count = f.perPage
-
-	r.ParseForm()
-	if pStr, ok := r.Form["page"]; ok {
-		if pg, pgErr := strconv.Atoi(pStr[0]); pgErr == nil {
-			paginator.Offset = pg
-		}
-	}
-
-	if paginator.Offset > 1 {
-		paginator.HasNewer = true
-		paginator.NewerIndex = paginator.Offset - 1
-	}
-
-	if paginator.Offset*paginator.Count < total {
-		paginator.HasOlder = true
-		paginator.OlderIndex = paginator.Offset + 1
-		if paginator.OlderIndex == 1 {
-			paginator.OlderIndex += 1
-		}
-	}
-
-	paginator.Total = total
-
-	return paginator
-}
-
 func (f FrontBase) handleRoot(w http.ResponseWriter, r *http.Request) {
 	total, _ := f.rm.PostRepo.PublishedCount()
-	paginator := f.getPagination(r, total)
-	posts, err := f.rm.PostRepo.FindPublished((paginator.Offset-1)*paginator.Count, paginator.Count)
+	paginator := GetPagination(r, total, f.pageCount)
+	offset := paginator.Offset * paginator.Count
+	count := paginator.Count
+	log.Println("Offset:", offset, "Count:", count)
+	posts, err := f.rm.PostRepo.FindPublished(offset, count)
+
 	data := make(map[string]interface{})
 	data["pagination"] = paginator
 	data["posts"] = posts
