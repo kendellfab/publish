@@ -30,7 +30,7 @@ func (f FrontCategories) handleCategory(w http.ResponseWriter, r *http.Request) 
 	cat, err := f.rm.CategoryRepo.FindBySlug(slug)
 	if err == nil {
 		data["category"] = cat
-		posts, pErr := f.rm.PostRepo.FindByCategory(cat)
+		posts, pErr := f.rm.PostRepo.FindByCategory(cat, 0, 10)
 		if pErr == nil {
 			data["posts"] = posts
 		} else {

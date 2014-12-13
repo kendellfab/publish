@@ -7,6 +7,7 @@ import (
 type Config struct {
 	Port        int           `toml:"port"`
 	SiteName    string        `toml:"site"`
+	PerPage     int           `toml:"per_page"`
 	AdminDir    string        `toml:"admin"`
 	ThemeDir    string        `toml:"theme"`
 	SessionKeys []string      `toml:"session"`

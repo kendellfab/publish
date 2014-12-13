@@ -98,9 +98,9 @@ func (repo *DbPostRepo) FindBySlug(slug string) (*domain.Post, error) {
 	return posts[0], nil
 }
 
-func (repo *DbPostRepo) FindByCategory(category *domain.Category) ([]*domain.Post, error) {
-	sql := "SELECT id, title, slug, author, created, content, type, published, tags, category FROM post WHERE category=? AND published = 1;"
-	rows, qError := repo.db.Query(sql, category.Id)
+func (repo *DbPostRepo) FindByCategory(category *domain.Category, offset, limit int) ([]*domain.Post, error) {
+	sql := "SELECT id, title, slug, author, created, content, type, published, tags, category FROM post WHERE category=? AND published = 1 ORDER BY created DESC LIMIT ? OFFSET ?;"
+	rows, qError := repo.db.Query(sql, category.Id, limit, offset)
 	if qError != nil {
 		return nil, qError
 	}
@@ -109,7 +109,7 @@ func (repo *DbPostRepo) FindByCategory(category *domain.Category) ([]*domain.Pos
 }
 
 func (repo *DbPostRepo) FindAll() ([]*domain.Post, error) {
-	sql := "SELECT id, title, slug, author, created, content, type, published, tags, category FROM post"
+	sql := "SELECT id, title, slug, author, created, content, type, published, tags, category FROM post ORDER BY created DESC;"
 	rows, qError := repo.db.Query(sql)
 	if qError != nil {
 		return nil, qError
@@ -152,6 +152,28 @@ func (repo *DbPostRepo) Delete(id int) error {
 	sql := "DELETE FROM post WHERE id = ?"
 	_, err := repo.db.Exec(sql, id)
 	return err
+}
+
+func (repo *DbPostRepo) PublishedCount() (int, error) {
+	sel := "SELECT count(*) FROM post WHERE published = 1;"
+	row := repo.db.QueryRow(sel)
+	var count int
+	scanErr := row.Scan(&count)
+	if scanErr != nil {
+		return 0, scanErr
+	}
+	return count, nil
+}
+
+func (repo *DbPostRepo) PublishedCountCategory(catId int) (int, error) {
+	sel := "SELECT count(*) FROM post WHERE published = 1 AND category = ?;"
+	row := repo.db.QueryRow(sel, catId)
+	var count int
+	scanErr := row.Scan(&count)
+	if scanErr != nil {
+		return 0, scanErr
+	}
+	return count, nil
 }
 
 func (repo *DbPostRepo) scanPost(rows *sql.Rows) []*domain.Post {
