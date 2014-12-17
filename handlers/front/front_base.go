@@ -11,13 +11,13 @@ import (
 )
 
 type FrontBase struct {
-	milo.Renderer
+	*milo.Renderer
 	rm        usecases.RepoManager
 	config    domain.Config
 	pageCount int
 }
 
-func NewFrontBase(rend milo.Renderer, rm usecases.RepoManager, c domain.Config) FrontBase {
+func NewFrontBase(rend *milo.Renderer, rm usecases.RepoManager, c domain.Config) FrontBase {
 	base := FrontBase{Renderer: rend, rm: rm, config: c}
 	base.pageCount = c.PerPage
 	return base

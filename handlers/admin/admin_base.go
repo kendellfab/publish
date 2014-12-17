@@ -10,13 +10,14 @@ import (
 )
 
 type AdminBase struct {
-	milo.Renderer
+	*milo.Renderer
+	*milo.MsgRender
 	rm    usecases.RepoManager
 	store sessions.Store
 }
 
-func NewAdminBase(rend milo.Renderer, rm usecases.RepoManager, store sessions.Store) AdminBase {
-	base := AdminBase{Renderer: rend, rm: rm, store: store}
+func NewAdminBase(rend *milo.Renderer, msgRend *milo.MsgRender, rm usecases.RepoManager, store sessions.Store) AdminBase {
+	base := AdminBase{Renderer: rend, MsgRender: msgRend, rm: rm, store: store}
 	return base
 }
 

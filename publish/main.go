@@ -39,19 +39,21 @@ func main() {
 	repoManager.PayloadRepo = interfaces.NewPayloadRepo(config, repoManager.CategoryRepo, repoManager.PostRepo)
 	repoManager.ViewRepo = interfaces.NewDbViewRepo(db)
 
-	adminRender := milo.NewDefaultRenderer(filepath.Join(config.AdminDir, "tpls"), false, nil)
+	adminRender := milo.NewRenderer(filepath.Join(config.AdminDir, "tpls"), false, nil)
 	adminRender.RegisterTemplateFunc("fmt_date", usecases.FormatDate)
 	adminRender.RegisterTemplateFunc("fmt_bool", usecases.FormatBool)
 	adminRender.RegisterTemplateFunc("rend_md", usecases.RenderMarkdown)
 
-	frontendRender := milo.NewDefaultRenderer(filepath.Join(config.ThemeDir, "tpls"), false, nil)
+	msgRend := milo.NewMsgRender(filepath.Join(config.AdminDir, "msgs"))
+
+	frontendRender := milo.NewRenderer(filepath.Join(config.ThemeDir, "tpls"), false, nil)
 	frontendRender.RegisterTemplateFunc("fmt_date", usecases.FormatDate)
 	frontendRender.RegisterTemplateFunc("fmt_bool", usecases.FormatBool)
 	frontendRender.RegisterTemplateFunc("rend_md", usecases.RenderMarkdown)
 
 	store := sessions.NewCookieStore([]byte(config.SessionKeys[0]))
 
-	adminBase := admin.NewAdminBase(adminRender, repoManager, store)
+	adminBase := admin.NewAdminBase(adminRender, msgRend, repoManager, store)
 	adminGen := admin.NewAdminGeneral(&adminBase, repoManager)
 	adminPosts := admin.NewAdminPost(&adminBase, repoManager)
 	adminCat := admin.NewAdminCat(&adminBase, repoManager)
