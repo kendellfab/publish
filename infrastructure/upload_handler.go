@@ -3,6 +3,7 @@ package infrastructure
 import (
 	"github.com/kendellfab/publish/usecases"
 	"io"
+	"io/ioutil"
 	"log"
 	"mime/multipart"
 	"os"
@@ -64,6 +65,6 @@ func (uh UploadHandler) DeleteFile(file string) error {
 	return os.Remove(path)
 }
 
-func (uh UploadHandler) ListFiles() ([]string, error) {
-	return nil, nil
+func (uh UploadHandler) ListFiles() ([]os.FileInfo, error) {
+	return ioutil.ReadDir(uh.baseDir)
 }

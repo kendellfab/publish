@@ -13,9 +13,12 @@
 	</div>
 	<div class="col-lg-3">
 		<button ng-click="savePost();" type="submit" style="width: 100%;" class="btn btn-primary">Save</button>
+		<br />
+		<br />
 		<div ng-show="saving" class="save-indicator">
 			<img src="/admin/img/ajax-loader.gif" /> <span>Saving...</span>
 		</div>
+		<button type="button" class="btn btn-success" style="width: 100%;" data-toggle="modal" data-target="#myModal">Uploads</button>
 		<br />
 		<br />
 		<div class="panel panel-default">
@@ -38,6 +41,25 @@
         </div>
 	</div>
 </div>
+
+<div class="modal fade" id="myModal">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+        <h4 class="modal-title">Modal title</h4>
+      </div>
+      <div class="modal-body">
+        <p>One fine body&hellip;</p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+        <button type="button" class="btn btn-primary">Save changes</button>
+      </div>
+    </div><!-- /.modal-content -->
+  </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
+
 </div>
 {{ end }}
 

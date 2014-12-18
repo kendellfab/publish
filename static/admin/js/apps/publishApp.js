@@ -15,7 +15,16 @@ pubApp.factory('res', ['$resource', function($resource){
 		}
 	});
 
+	var uploadResource = $resource("/admin/uploads/:id/:action", {}, {
+		list: {
+			method: "Get",
+			params: {id: "list"},
+			isArray: true
+		}
+	});
+
 	return {
-		post: postResource
+		post: postResource,
+		uploads: uploadResource
 	}
 }])

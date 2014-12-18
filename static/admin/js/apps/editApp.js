@@ -3,6 +3,8 @@ pubApp.controller("EditController", ["$scope", "res", function($scope, res) {
 	$scope.cats = backend.cats;
 	$scope.saving = false;
 
+	$scope.uploads = res.uploads.list();
+
 	$scope.savePost = function() {
 		$scope.saving = true;
 		res.post.update($scope.post, success, error);

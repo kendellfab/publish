@@ -22,10 +22,13 @@ func NewAdminUpload(base *AdminBase, rm usecases.RepoManager) AdminUpload {
 func (a AdminUpload) RegisterRoutes(app *milo.Milo) {
 	app.Route("/admin/uploads", []string{"Get"}, a.authMid(a.handleUploads))
 	app.Route("/admin/upload", []string{"Post"}, a.authMid(a.handleDoUpload))
+	app.Route("/admin/uploads/list", []string{"Get"}, a.authMid(a.handleListUploads))
 }
 
 func (a AdminUpload) handleUploads(w http.ResponseWriter, r *http.Request) {
-	a.RenderTemplates(w, r, nil, "base.tpl", "uploads.tpl")
+	data := make(map[string]interface{})
+	data["files"], data["error"] = a.rm.UploadRepo.ListFiles()
+	a.RenderTemplates(w, r, data, "base.tpl", "uploads.tpl")
 }
 
 func (a AdminUpload) handleDoUpload(w http.ResponseWriter, r *http.Request) {
@@ -43,4 +46,13 @@ func (a AdminUpload) handleDoUpload(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 	a.Redirect(w, r, "/admin/uploads", http.StatusSeeOther)
+}
+
+func (a AdminUpload) handleListUploads(w http.ResponseWriter, r *http.Request) {
+	files, err := a.rm.UploadRepo.ListFiles()
+	if err != nil {
+		a.RenderError(w, r, http.StatusInternalServerError, err.Error())
+		return
+	}
+	a.RenderJson(w, r, files)
 }
