@@ -155,6 +155,9 @@
                     <li>
                         <a href="/admin/cats"><i class="fa fa-fw fa-tags"></i> Categories</a>
                     </li>
+                    <li>
+                        <a href="/admin/uploads"><i class="fa fa-fw fa-cloud-upload"></i> Uploads</a>
+                    </li>
                     <!-- <li>
                         <a href="javascript:;" data-toggle="collapse" data-target="#demo"><i class="fa fa-fw fa-arrows-v"></i> Dropdown <i class="fa fa-fw fa-caret-down"></i></a>
                         <ul id="demo" class="collapse">

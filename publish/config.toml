@@ -3,7 +3,7 @@ site = "KendellFabrici.us"
 per_page = 5
 admin = "../static/admin"
 theme = "../static/hyde"
-upload = "~/Desktop/uploads"
+upload = "/home/kendell/Desktop/uploads"
 session = ["ADF@#$123Mdskoek"]
 
 [sqlite]

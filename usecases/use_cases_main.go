@@ -13,4 +13,5 @@ type RepoManager struct {
 	PageRepo     domain.PageRepo
 	PayloadRepo  domain.PayloadRepo
 	ViewRepo     domain.ViewRepo
+	UploadRepo   FileRepo
 }

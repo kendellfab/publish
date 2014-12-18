@@ -38,6 +38,7 @@ func main() {
 	repoManager.PageRepo = interfaces.NewDbPageRepo(db)
 	repoManager.PayloadRepo = interfaces.NewPayloadRepo(config, repoManager.CategoryRepo, repoManager.PostRepo)
 	repoManager.ViewRepo = interfaces.NewDbViewRepo(db)
+	repoManager.UploadRepo = infrastructure.NewUploadHandler(config.UploadDir)
 
 	adminRender := milo.NewRenderer(filepath.Join(config.AdminDir, "tpls"), false, nil)
 	adminRender.RegisterTemplateFunc("fmt_date", usecases.FormatDate)
@@ -57,6 +58,7 @@ func main() {
 	adminGen := admin.NewAdminGeneral(&adminBase, repoManager)
 	adminPosts := admin.NewAdminPost(&adminBase, repoManager)
 	adminCat := admin.NewAdminCat(&adminBase, repoManager)
+	adminUpload := admin.NewAdminUpload(&adminBase, repoManager)
 
 	frontBase := front.NewFrontBase(frontendRender, repoManager, config)
 	frontPosts := front.NewFrontPosts(&frontBase)
@@ -67,6 +69,7 @@ func main() {
 	adminGen.RegisterRoutes(app)
 	adminPosts.RegisterRoutes(app)
 	adminCat.RegisterRoutes(app)
+	adminUpload.RegisterRoutes(app)
 	frontBase.RegisterRoutes(app)
 	frontPosts.RegisterRoutes(app)
 	frontCategories.RegisterRoutes(app)
@@ -74,6 +77,7 @@ func main() {
 	app.RouteAssetStripPrefix("/admin", config.AdminDir)
 	app.RouteAsset("/css", config.ThemeDir)
 	app.RouteAsset("/js", config.ThemeDir)
+	app.RouteAssetStripPrefix("/uploads", config.UploadDir)
 
 	app.Run()
 }
