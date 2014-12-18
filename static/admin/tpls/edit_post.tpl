@@ -43,18 +43,32 @@
 </div>
 
 <div class="modal fade" id="myModal">
-  <div class="modal-dialog">
+  <div class="modal-dialog modal-admin">
     <div class="modal-content">
       <div class="modal-header">
         <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
-        <h4 class="modal-title">Modal title</h4>
+        <h4 class="modal-title">Upload List</h4>
       </div>
-      <div class="modal-body">
-        <p>One fine body&hellip;</p>
+      <div class="modal-body modal-scroll">
+        <table class="table table-bordered table-hover table-striped">
+			<thead>
+				<tr>
+					<th>Thumb</th>
+					<th>Name</th>
+					<th>Link</th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr ng-repeat="file in uploads">
+					<td><img src="/uploads/||file.name||" height="50" /></td>
+					<td>||file.name||</td>
+					<td>/uploads/||file.name||</td>
+				</tr>
+			</tbody>
+        </table>
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-        <button type="button" class="btn btn-primary">Save changes</button>
       </div>
     </div><!-- /.modal-content -->
   </div><!-- /.modal-dialog -->

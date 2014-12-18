@@ -1,7 +1,9 @@
 {{ define "Content" }}
 <div class="row">
-	<div class="col-lg-12">
+	<div class="col-lg-3">
 		<h3>Uploads</h3>
+	</div>
+	<div class="col-lg-9">
 		<div class="panel panel-default">
 			<div class="panel-heading">
 				<h3 class="panel-title">File Upload</h3>
@@ -21,13 +23,21 @@
 		<table class="table table-bordered table-hover table-striped">
 			<thead>
 				<tr>
+					<th>Thumbnail</th>
 					<th>File Name</th>
+					<th>Size</th>
+					<th>Link</th>
+					<th>Delete</th>
 				</tr>
 			</thead>
 			<tbody>
 				{{ range .files }}
 					<tr>
+						<td><a href="/uploads/{{ .Name }}"><img src="/uploads/{{ .Name }}" height="75" /></a></td>
 						<td>{{ .Name }}</td>
+						<td>{{ .Size }}</td>
+						<td>/uploads/{{ .Name }}</td>
+						<td><a href="/admin/uploads/{{ .Name }}/delete">Delete</a></td>
 					</tr>
 				{{ end }}
 			</tbody>

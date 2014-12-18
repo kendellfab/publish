@@ -2,6 +2,7 @@ package admin
 
 import (
 	"fmt"
+	"github.com/gorilla/mux"
 	"github.com/kendellfab/milo"
 	"github.com/kendellfab/publish/usecases"
 	"net/http"
@@ -23,6 +24,7 @@ func (a AdminUpload) RegisterRoutes(app *milo.Milo) {
 	app.Route("/admin/uploads", []string{"Get"}, a.authMid(a.handleUploads))
 	app.Route("/admin/upload", []string{"Post"}, a.authMid(a.handleDoUpload))
 	app.Route("/admin/uploads/list", []string{"Get"}, a.authMid(a.handleListUploads))
+	app.Route("/admin/uploads/{name}/delete", []string{"Get"}, a.authMid(a.handleDelete))
 }
 
 func (a AdminUpload) handleUploads(w http.ResponseWriter, r *http.Request) {
@@ -55,4 +57,15 @@ func (a AdminUpload) handleListUploads(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	a.RenderJson(w, r, files)
+}
+
+func (au AdminUpload) handleDelete(w http.ResponseWriter, r *http.Request) {
+	name := mux.Vars(r)["name"]
+	err := au.rm.UploadRepo.DeleteFile(name)
+	if err != nil {
+		au.setErrorFlash(w, r, err.Error())
+	} else {
+		au.setSuccessFlash(w, r, "File removed")
+	}
+	au.Redirect(w, r, "/admin/uploads", http.StatusSeeOther)
 }

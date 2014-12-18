@@ -1,6 +1,7 @@
 package infrastructure
 
 import (
+	"github.com/kendellfab/publish/domain"
 	"github.com/kendellfab/publish/usecases"
 	"io"
 	"io/ioutil"
@@ -38,7 +39,6 @@ func (uh UploadHandler) SaveFile(input *os.File) error {
 }
 
 func (uh UploadHandler) SaveMultipartFile(input *multipart.FileHeader) error {
-	log.Println(input.Filename)
 	infile, inErr := input.Open()
 	if inErr != nil {
 		return inErr
@@ -51,12 +51,10 @@ func (uh UploadHandler) SaveMultipartFile(input *multipart.FileHeader) error {
 	}
 	defer outfile.Close()
 
-	size, err := io.Copy(outfile, infile)
+	_, err := io.Copy(outfile, infile)
 	if err != nil {
 		return err
 	}
-	log.Println("Uploaded: ", input.Filename, "Size:", size)
-
 	return nil
 }
 
@@ -65,6 +63,21 @@ func (uh UploadHandler) DeleteFile(file string) error {
 	return os.Remove(path)
 }
 
-func (uh UploadHandler) ListFiles() ([]os.FileInfo, error) {
-	return ioutil.ReadDir(uh.baseDir)
+func (uh UploadHandler) ListFiles() ([]*domain.UploadNode, error) {
+	fis, err := ioutil.ReadDir(uh.baseDir)
+	if err != nil {
+		return nil, err
+	}
+	nodes := make([]*domain.UploadNode, 0)
+
+	for _, fi := range fis {
+		node := &domain.UploadNode{}
+		node.Name = fi.Name()
+		node.Size = fi.Size()
+		node.ModTime = fi.ModTime()
+		node.IsDir = fi.IsDir()
+		nodes = append(nodes, node)
+	}
+
+	return nodes, nil
 }

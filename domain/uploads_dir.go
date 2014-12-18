@@ -14,8 +14,8 @@ import (
 type UploadNode struct {
 	Name     string       `json:"name"`
 	Size     int64        `json:"size"`
-	ModTime  time.Time    `json:"mod_time"`
-	IsDir    bool         `json:"is_dir"`
+	ModTime  time.Time    `json:"modTime"`
+	IsDir    bool         `json:"isDir"`
 	Children []UploadNode `json:"children"`
 }
 

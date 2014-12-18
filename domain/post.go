@@ -49,6 +49,10 @@ func (p *Post) GenerateSlug() {
 }
 
 func (p Post) Description() string {
+	index := strings.Index(p.Content, "<!--desc-->")
+	if index != -1 {
+		return p.Content[0:index]
+	}
 	if len(p.Content) > 150 {
 		return p.Content[0:150]
 	}

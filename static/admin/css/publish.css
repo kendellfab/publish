@@ -7,3 +7,13 @@
 .save-indicator {
 	padding-top: 5px;
 }
+
+body .modal-admin {
+    /* new custom width */
+    width: 65%;
+}
+
+body .modal-scroll {
+    overflow-y: scroll;
+    max-height: 450px;
+}
