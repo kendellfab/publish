@@ -16,6 +16,13 @@ const (
 	FLASH_ERROR    = "error_flash"
 	FLASH_SUCCESS  = "success_flash"
 	CONTEXT_USER   = "cntxt_user"
+
+	PUBLISH_PREFIX = "PUBLISH"
+	EMAIL_HOST     = "_HOST"
+	EMAIL_PORT     = "_PORT"
+	EMAIL_USERNAME = "_USERNAME"
+	EMAIL_PASSWORD = "_PASSWORD"
+	EMAIL_FROM     = "_FROM"
 )
 
 func SerializeDate(input time.Time) string {

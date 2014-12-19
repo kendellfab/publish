@@ -18,6 +18,7 @@ import (
 func main() {
 	log.Println("Starting publish... DB:", infrastructure.CurrentDb)
 	var configPath = flag.String("c", "config.toml", "Set the config path.")
+	var configPrefix = flag.String("p", domain.PUBLISH_PREFIX, "Set the prefix to be used in environment variables.")
 	flag.Parse()
 
 	var config domain.Config
@@ -25,6 +26,8 @@ func main() {
 	if tomlErr != nil {
 		log.Fatal(tomlErr)
 	}
+
+	config.Email = domain.EmailConfigEnvironmentOverride(*configPrefix, config.Email)
 
 	db := infrastructure.ConnectDb(&config)
 	defer db.Close()
@@ -38,6 +41,7 @@ func main() {
 	repoManager.PageRepo = interfaces.NewDbPageRepo(db)
 	repoManager.PayloadRepo = interfaces.NewPayloadRepo(config, repoManager.CategoryRepo, repoManager.PostRepo)
 	repoManager.ViewRepo = interfaces.NewDbViewRepo(db)
+	repoManager.ResetRepo = interfaces.NewDbResetRepo(db)
 	repoManager.UploadRepo = infrastructure.NewUploadHandler(config.UploadDir)
 
 	adminRender := milo.NewRenderer(filepath.Join(config.AdminDir, "tpls"), false, nil)
@@ -46,6 +50,7 @@ func main() {
 	adminRender.RegisterTemplateFunc("rend_md", usecases.RenderMarkdown)
 
 	msgRend := milo.NewMsgRender(filepath.Join(config.AdminDir, "msgs"))
+	emailMessenger := infrastructure.NewEmailMessenger(config.Email)
 
 	frontendRender := milo.NewRenderer(filepath.Join(config.ThemeDir, "tpls"), false, nil)
 	frontendRender.RegisterTemplateFunc("fmt_date", usecases.FormatDate)
@@ -59,6 +64,7 @@ func main() {
 	adminPosts := admin.NewAdminPost(&adminBase, repoManager)
 	adminCat := admin.NewAdminCat(&adminBase, repoManager)
 	adminUpload := admin.NewAdminUpload(&adminBase, repoManager)
+	adminForgot := admin.NewAdminForgot(&adminBase, repoManager, emailMessenger)
 
 	frontBase := front.NewFrontBase(frontendRender, repoManager, config)
 	frontPosts := front.NewFrontPosts(&frontBase)
@@ -70,6 +76,7 @@ func main() {
 	adminPosts.RegisterRoutes(app)
 	adminCat.RegisterRoutes(app)
 	adminUpload.RegisterRoutes(app)
+	adminForgot.RegisterRoutes(app)
 	frontBase.RegisterRoutes(app)
 	frontPosts.RegisterRoutes(app)
 	frontCategories.RegisterRoutes(app)

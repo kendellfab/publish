@@ -25,7 +25,6 @@ func (repo *DbUserRepo) init() {
 }
 
 func (repo *DbUserRepo) Store(user *domain.User) error {
-	// repo.logger.Log("Storing user: " + user.Email + " " + user.Name)
 	insertStmt := "INSERT INTO user(name, email, password, role) VALUES(?, ?, ?, ?)"
 	res, err := repo.db.Exec(insertStmt, user.Name, user.Email, user.Password, user.Role)
 

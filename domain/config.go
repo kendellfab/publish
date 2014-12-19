@@ -2,6 +2,9 @@ package domain
 
 import (
 	"fmt"
+	"log"
+	"os"
+	"strconv"
 )
 
 type Config struct {
@@ -14,6 +17,7 @@ type Config struct {
 	UploadDir   string        `toml:"upload"`
 	Sqlite      *ConfigSqlite `toml:"sqlite"`
 	Mysql       *ConfigMysql  `toml:"mysql"`
+	Email       *ConfigEmail  `toml:"email"`
 }
 
 func (config *Config) GetSessionKeys() [][]byte {
@@ -22,6 +26,40 @@ func (config *Config) GetSessionKeys() [][]byte {
 		keys = append(keys, []byte(element))
 	}
 	return keys
+}
+
+func EmailConfigEnvironmentOverride(prefix string, ce *ConfigEmail) *ConfigEmail {
+	if ce == nil {
+		ce = &ConfigEmail{}
+	}
+	if host := os.Getenv(prefix + EMAIL_HOST); host != "" {
+		ce.Host = host
+	}
+	if portStr := os.Getenv(prefix + EMAIL_PORT); portStr != "" {
+		if port, pErr := strconv.Atoi(portStr); pErr == nil {
+			ce.Port = port
+		} else {
+			log.Fatal(pErr)
+		}
+	}
+	if username := os.Getenv(prefix + EMAIL_USERNAME); username != "" {
+		ce.Username = username
+	}
+	if password := os.Getenv(prefix + EMAIL_PASSWORD); password != "" {
+		ce.Password = password
+	}
+	if from := os.Getenv(prefix + EMAIL_FROM); from != "" {
+		ce.From = from
+	}
+	return ce
+}
+
+type ConfigEmail struct {
+	Host     string `toml:"host"`
+	Port     int    `toml:"port"`
+	Username string `toml:"username"`
+	Password string `toml:"password"`
+	From     string `toml:"from"`
 }
 
 type ConfigSqlite struct {

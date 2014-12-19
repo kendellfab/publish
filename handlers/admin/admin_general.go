@@ -93,7 +93,7 @@ func (a AdminGeneral) handleLogin(w http.ResponseWriter, r *http.Request) {
 	if len(errs) > 0 {
 		data["setup_error"] = errs
 	}
-	a.RenderTemplates(w, r, data, "login.tpl")
+	a.RenderTemplates(w, r, data, "no_auth_base.tpl", "login.tpl")
 }
 
 func (a AdminGeneral) handleLogout(w http.ResponseWriter, r *http.Request) {
