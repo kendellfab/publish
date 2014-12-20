@@ -78,6 +78,12 @@ func (repo *DbUserRepo) FindAdmin() (*[]domain.User, error) {
 	return &users, nil
 }
 
+func (repo *DbUserRepo) UpdatePassword(userId, password string) error {
+	up := "UPDATE user SET password = ? WHERE id = ?;"
+	_, err := repo.db.Exec(up, password, userId)
+	return err
+}
+
 func scanUsers(rows *sql.Rows) []domain.User {
 	fmt.Println("Scanning...")
 	users := make([]domain.User, 0)

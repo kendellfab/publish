@@ -8,8 +8,8 @@ import (
 	"github.com/kendellfab/milo"
 	"github.com/kendellfab/publish/domain"
 	"github.com/kendellfab/publish/usecases"
+	"golang.org/x/crypto/bcrypt"
 	"io"
-	"log"
 	"net/http"
 	"time"
 )
@@ -68,14 +68,21 @@ func (a AdminForgot) handleSubmitForgot(w http.ResponseWriter, r *http.Request) 
 	data["request"] = r
 	data["reset"] = reset
 
-	msg, msgErr := a.MsgRender.Render(data, "reset_password.tpl")
+	msg, msgErr := a.MsgRender.RenderHtml(data, "reset_password.tpl")
 	if msgErr != nil {
 		a.setErrorFlash(w, r, msgErr.Error())
 		a.Redirect(w, r, "/admin/forgot", http.StatusSeeOther)
 		return
 	}
 
-	fmt.Fprint(w, msg)
+	sendErr := a.em.SendMessage(user.Email, "Password Reset", msg)
+	if sendErr != nil {
+		a.setErrorFlash(w, r, sendErr.Error())
+		a.Redirect(w, r, "/admin/forgot", http.StatusSeeOther)
+		return
+	}
+	a.setSuccessFlash(w, r, "Password reset sent.")
+	a.Redirect(w, r, "/login", http.StatusSeeOther)
 }
 
 func (a AdminForgot) handleRedeem(w http.ResponseWriter, r *http.Request) {
@@ -106,5 +113,32 @@ func (a AdminForgot) handleRedeem(w http.ResponseWriter, r *http.Request) {
 }
 
 func (a AdminForgot) handleSubmitRedeem(w http.ResponseWriter, r *http.Request) {
+	r.ParseForm()
+	userId := r.Form["user_id"][0]
+	password := r.Form["password"][0]
+	token := r.Form["token"][0]
+
+	if password == "" {
+		a.setErrorFlash(w, r, "Password must be set.")
+		a.Redirect(w, r, "/admin/redeem/"+token, http.StatusSeeOther)
+		return
+	}
+
+	bArr, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
+	if err != nil {
+		a.setErrorFlash(w, r, err.Error())
+		a.Redirect(w, r, "/admin/redeem/"+token, http.StatusSeeOther)
+		return
+	}
+
+	upErr := a.rm.UserRepo.UpdatePassword(userId, string(bArr))
+	if upErr != nil {
+		a.setErrorFlash(w, r, upErr.Error())
+		a.Redirect(w, r, "/admin/redeem/"+token, http.StatusSeeOther)
+		return
+	}
+
+	a.setSuccessFlash(w, r, "Password reset")
+	a.Redirect(w, r, "/login", http.StatusSeeOther)
 
 }

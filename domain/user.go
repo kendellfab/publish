@@ -10,6 +10,7 @@ type UserRepo interface {
 	FindByIdInt(id int64) (*User, error)
 	FindByEmail(email string) (*User, error)
 	FindAdmin() (*[]User, error)
+	UpdatePassword(userId, password string) error
 }
 
 type User struct {
