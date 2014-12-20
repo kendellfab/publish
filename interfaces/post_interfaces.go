@@ -164,6 +164,14 @@ func (repo *DbPostRepo) PublishedCountCategory(catId int) (int, error) {
 	return count, nil
 }
 
+func (repo *DbPostRepo) AddToSeries(id, seriesId string) error {
+	return nil
+}
+
+func (repo *DbPostRepo) GetForSeries(seriesId string) ([]*domain.Post, error) {
+	return nil, nil
+}
+
 func (repo *DbPostRepo) scanPost(row *sql.Row) (*domain.Post, error) {
 	var post domain.Post
 	var authorId int64

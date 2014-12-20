@@ -10,6 +10,7 @@ import (
 type Config struct {
 	Port        int           `toml:"port"`
 	SiteName    string        `toml:"site"`
+	CacheTpls   bool          `toml:"cache_tpls"`
 	PerPage     int           `toml:"per_page"`
 	AdminDir    string        `toml:"admin"`
 	ThemeDir    string        `toml:"theme"`

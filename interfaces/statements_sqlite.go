@@ -42,7 +42,8 @@ var CREATE_POST = `CREATE TABLE post (
 "category" INTEGER,
 "day" INTEGER,
 "month" INTEGER,
-"year" INTEGER
+"year" INTEGER,
+"series" INTEGER
 )`
 
 var CREATE_CONTACT = `CREATE TABLE contact (
@@ -74,3 +75,10 @@ var CREATE_RESET = `CREATE TABLE reset(
 "created" VARCHAR(128) NOT NULL,
 "expires" VARCHAR(128) NOT NULL,
 "token" VARCHAR(128) NOT NULL);`
+
+var CREATE_SERIES = `CREATE TABLE series(
+"id" INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+"title" VARCHAR(256) NOT NULL,
+"slug" VARCHAR(256) NOT NULL,
+"created" VARCHAR(128) NOT NULL,
+"description" TEXT);`

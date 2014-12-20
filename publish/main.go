@@ -42,9 +42,10 @@ func main() {
 	repoManager.PayloadRepo = interfaces.NewPayloadRepo(config, repoManager.CategoryRepo, repoManager.PostRepo)
 	repoManager.ViewRepo = interfaces.NewDbViewRepo(db)
 	repoManager.ResetRepo = interfaces.NewDbResetRepo(db)
+	repoManager.SeriesRepo = interfaces.NewDbSeriesRepo(db, repoManager.PostRepo)
 	repoManager.UploadRepo = infrastructure.NewUploadHandler(config.UploadDir)
 
-	adminRender := milo.NewRenderer(filepath.Join(config.AdminDir, "tpls"), false, nil)
+	adminRender := milo.NewRenderer(filepath.Join(config.AdminDir, "tpls"), config.CacheTpls, nil)
 	adminRender.RegisterTemplateFunc("fmt_date", usecases.FormatDate)
 	adminRender.RegisterTemplateFunc("fmt_bool", usecases.FormatBool)
 	adminRender.RegisterTemplateFunc("rend_md", usecases.RenderMarkdown)
@@ -52,7 +53,7 @@ func main() {
 	msgRend := milo.NewMsgRender(filepath.Join(config.AdminDir, "msgs"))
 	emailMessenger := infrastructure.NewEmailMessenger(config.Email)
 
-	frontendRender := milo.NewRenderer(filepath.Join(config.ThemeDir, "tpls"), false, nil)
+	frontendRender := milo.NewRenderer(filepath.Join(config.ThemeDir, "tpls"), config.CacheTpls, nil)
 	frontendRender.RegisterTemplateFunc("fmt_date", usecases.FormatDate)
 	frontendRender.RegisterTemplateFunc("fmt_bool", usecases.FormatBool)
 	frontendRender.RegisterTemplateFunc("rend_md", usecases.RenderMarkdown)
@@ -65,6 +66,7 @@ func main() {
 	adminCat := admin.NewAdminCat(&adminBase, repoManager)
 	adminUpload := admin.NewAdminUpload(&adminBase, repoManager)
 	adminForgot := admin.NewAdminForgot(&adminBase, repoManager, emailMessenger)
+	adminSeries := admin.NewAdminSeries(&adminBase, repoManager)
 
 	frontBase := front.NewFrontBase(frontendRender, repoManager, config)
 	frontPosts := front.NewFrontPosts(&frontBase)
@@ -77,6 +79,7 @@ func main() {
 	adminCat.RegisterRoutes(app)
 	adminUpload.RegisterRoutes(app)
 	adminForgot.RegisterRoutes(app)
+	adminSeries.RegisterRoutes(app)
 	frontBase.RegisterRoutes(app)
 	frontPosts.RegisterRoutes(app)
 	frontCategories.RegisterRoutes(app)
