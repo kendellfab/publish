@@ -2,6 +2,7 @@ package interfaces
 
 import (
 	"database/sql"
+	"fmt"
 	"github.com/kendellfab/publish/domain"
 	"log"
 	"strings"
@@ -12,10 +13,16 @@ type DbPostRepo struct {
 	db         *sql.DB
 	authorRepo domain.UserRepo
 	catRepo    domain.CategoryRepo
+	cache      *PostCache
 }
 
 func NewDbPostRepo(db *sql.DB, ar domain.UserRepo, cr domain.CategoryRepo) domain.PostRepo {
 	postRepo := &DbPostRepo{db: db, authorRepo: ar, catRepo: cr}
+	cache, err := NewPostCache(100)
+	if err != nil {
+		log.Fatal(err)
+	}
+	postRepo.cache = cache
 	postRepo.init()
 	return postRepo
 }
@@ -81,6 +88,9 @@ func (repo *DbPostRepo) FindByIdString(id string) (*domain.Post, error) {
 }
 
 func (repo *DbPostRepo) FindBySlug(slug string) (*domain.Post, error) {
+	if post, ok := repo.cache.Get(slug); ok {
+		return post, nil
+	}
 	sql := "SELECT id, title, slug, author, created, content, type, published, tags, category FROM post WHERE slug=?"
 	row := repo.db.QueryRow(sql, slug)
 	return repo.scanPost(row)
@@ -106,14 +116,64 @@ func (repo *DbPostRepo) FindAll() ([]*domain.Post, error) {
 	return posts, nil
 }
 
+func (repo *DbPostRepo) getPublishedIds(offset, limit int) ([]string, error) {
+	sel := "SELECT slug FROM post WHERE published = 1 ORDER BY created DESC LIMIT ? OFFSET ?;"
+	rows, qErr := repo.db.Query(sel, limit, offset)
+	if qErr != nil {
+		return nil, qErr
+	}
+	ids := make([]string, 0)
+	rows.Next()
+	for {
+		var id string
+		sErr := rows.Scan(&id)
+		if sErr == nil {
+			ids = append(ids, id)
+		}
+		if !rows.Next() {
+			break
+		}
+	}
+	return ids, nil
+}
+
 func (repo *DbPostRepo) FindPublished(offset, limit int) ([]*domain.Post, error) {
-	sel := "SELECT id, title, slug, author, created, content, type, published, tags, category FROM post WHERE published = 1 ORDER BY created DESC LIMIT ? OFFSET ?;"
-	rows, qError := repo.db.Query(sel, limit, offset)
+	posts := make([]*domain.Post, 0)
+
+	ids, err := repo.getPublishedIds(offset, limit)
+	faults := make([]interface{}, 0)
+	if err == nil {
+		for _, id := range ids {
+			if post, ok := repo.cache.Get(id); ok {
+				posts = append(posts, post)
+			} else {
+				faults = append(faults, id)
+			}
+		}
+	}
+
+	if len(faults) == 0 {
+		return posts, nil
+	}
+
+	var rows *sql.Rows
+	var qError error
+
+	if len(faults) == len(ids) {
+		sel := "SELECT id, title, slug, author, created, content, type, published, tags, category FROM post WHERE published = 1 ORDER BY created DESC LIMIT ? OFFSET ?;"
+		rows, qError = repo.db.Query(sel, limit, offset)
+	} else {
+		sel := "SELECT id, title, slug, author, created, content, type, published, tags, category FROM post WHERE slug IN(%s) ORDER BY created DESC;"
+		phs := fmt.Sprintf(sel, GetPlaceholders(faults))
+		rows, qError = repo.db.Query(phs, faults...)
+	}
+
 	if qError != nil {
 		return nil, qError
 	}
-	posts := repo.scanPosts(rows)
-	return posts, nil
+
+	results := repo.scanPosts(rows)
+	return append(posts, results...), nil
 }
 
 func (repo *DbPostRepo) FindByYearMonth(year, month string) ([]*domain.Post, error) {
@@ -197,15 +257,13 @@ func (repo *DbPostRepo) scanPost(row *sql.Row) (*domain.Post, error) {
 	if published == 1 {
 		post.Published = true
 	}
-
+	repo.cache.Add(post.Slug, &post)
 	return &post, nil
 
 }
 
 func (repo *DbPostRepo) scanPosts(rows *sql.Rows) []*domain.Post {
 	posts := make([]*domain.Post, 0)
-	authors := make(map[int64]domain.User)
-	cats := make(map[int]*domain.Category)
 	for {
 		var post domain.Post
 		var authorId int64
@@ -216,27 +274,17 @@ func (repo *DbPostRepo) scanPosts(rows *sql.Rows) []*domain.Post {
 		scanErr := rows.Scan(&post.Id, &post.Title, &post.Slug, &authorId, &createString, &post.Content, &post.ContentType, &published, &tagsString, &categoryId)
 
 		if scanErr == nil {
-			if a, ok := authors[authorId]; ok {
-				post.Author = a
-			} else {
-				author, err := repo.authorRepo.FindByIdInt(authorId)
+			author, err := repo.authorRepo.FindByIdInt(authorId)
 
-				if err == nil {
-					post.Author = *author
-					authors[authorId] = *author
-				}
+			if err == nil {
+				post.Author = *author
 			}
 
-			if c, ok := cats[categoryId]; ok {
-				post.Category = c
+			cat, err := repo.catRepo.FindById(categoryId)
+			if err == nil {
+				post.Category = cat
 			} else {
-				cat, err := repo.catRepo.FindById(categoryId)
-				if err == nil {
-					post.Category = cat
-					cats[categoryId] = cat
-				} else {
-					post.Category = nil
-				}
+				post.Category = nil
 			}
 
 			post.Created, _ = time.Parse(time.RFC3339, createString)
@@ -245,6 +293,7 @@ func (repo *DbPostRepo) scanPosts(rows *sql.Rows) []*domain.Post {
 				post.Published = true
 			}
 			posts = append(posts, &post)
+			repo.cache.Add(post.Slug, &post)
 		}
 
 		if !rows.Next() {

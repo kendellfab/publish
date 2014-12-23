@@ -2,6 +2,7 @@ package interfaces
 
 import (
 	"database/sql"
+	"fmt"
 	"github.com/kendellfab/publish/domain"
 	"log"
 	"strings"
@@ -11,11 +12,17 @@ import (
 var uncategorized = &domain.Category{Title: "Uncategorized", Slug: "uncategorized"}
 
 type DbCategoryRepo struct {
-	db *sql.DB
+	db    *sql.DB
+	cache *CategoryCache
 }
 
 func NewDbCategoryRepo(db *sql.DB) domain.CategoryRepo {
 	catRepo := &DbCategoryRepo{db: db}
+	cache, err := NewCategoryCache(25)
+	if err != nil {
+		log.Fatal(err)
+	}
+	catRepo.cache = cache
 	catRepo.init()
 	return catRepo
 }
@@ -49,17 +56,23 @@ func (repo *DbCategoryRepo) Store(category *domain.Category) error {
 }
 
 func (repo *DbCategoryRepo) FindById(id int) (*domain.Category, error) {
+	if cat, ok := repo.cache.Get(fmt.Sprintf("%d", id)); ok {
+		return cat, nil
+	}
 	var category domain.Category
 	var dateStr string
 	row := repo.db.QueryRow("SELECT id, title, slug, created FROM category WHERE id=?", id)
 	scanErr := row.Scan(&category.Id, &category.Title, &category.Slug, &dateStr)
-	if scanErr == nil {
-		date, _ := time.Parse(time.RFC3339, dateStr)
-		category.Created = date
-		return &category, nil
-	} else {
+	if scanErr != nil {
 		return nil, scanErr
 	}
+
+	date, _ := time.Parse(time.RFC3339, dateStr)
+	category.Created = date
+
+	repo.cache.Add(fmt.Sprintf("%d", id), &category)
+
+	return &category, nil
 }
 
 func (repo *DbCategoryRepo) FindByTitle(title string) (*domain.Category, error) {
@@ -90,13 +103,60 @@ func (repo *DbCategoryRepo) FindBySlug(slug string) (*domain.Category, error) {
 	}
 }
 
+func (repo *DbCategoryRepo) getCatIds() ([]string, error) {
+	sel := "SELECT id FROM category;"
+	rows, qErr := repo.db.Query(sel)
+	if qErr != nil {
+		return nil, qErr
+	}
+	ids := make([]string, 0)
+	rows.Next()
+	for {
+		var id string
+		sErr := rows.Scan(&id)
+		if sErr == nil {
+			ids = append(ids, id)
+		}
+		if !rows.Next() {
+			break
+		}
+	}
+	return ids, nil
+}
+
 func (repo *DbCategoryRepo) GetAll() ([]*domain.Category, error) {
-	rows, qError := repo.db.Query("SELECT id, title, slug, created FROM category")
+	cats := make([]*domain.Category, 0)
+	ids, err := repo.getCatIds()
+	faults := make([]interface{}, 0)
+	if err == nil {
+		for _, id := range ids {
+			if cat, ok := repo.cache.Get(id); ok {
+				cats = append(cats, cat)
+			} else {
+				faults = append(faults, id)
+			}
+		}
+	}
+
+	if len(faults) == 0 {
+		return cats, nil
+	}
+
+	var rows *sql.Rows
+	var qError error
+	if len(faults) == len(ids) {
+		rows, qError = repo.db.Query("SELECT id, title, slug, created FROM category")
+	} else {
+		sel := "SELECT id, title, slug, created FROM category WHERE id IN(%s);"
+		phs := fmt.Sprintf(sel, GetPlaceholders(faults))
+		rows, qError = repo.db.Query(phs, faults...)
+	}
+
 	if qError != nil {
 		return nil, qError
 	}
-	cats := repo.scanCategory(rows)
-	return cats, nil
+	results := repo.scanCategory(rows)
+	return append(cats, results...), nil
 }
 
 func (repo *DbCategoryRepo) GetAllCount() ([]*domain.Category, error) {

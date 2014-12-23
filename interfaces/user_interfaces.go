@@ -9,11 +9,17 @@ import (
 )
 
 type DbUserRepo struct {
-	db *sql.DB
+	db    *sql.DB
+	cache *AuthorCache
 }
 
 func NewDbUserRepo(db *sql.DB) domain.UserRepo {
 	userRepo := &DbUserRepo{db: db}
+	ac, err := NewAuthorCache(25)
+	if err != nil {
+		log.Fatal(err)
+	}
+	userRepo.cache = ac
 	userRepo.init()
 	return userRepo
 }
@@ -38,24 +44,30 @@ func (repo *DbUserRepo) Store(user *domain.User) error {
 }
 
 func (repo *DbUserRepo) FindById(id string) (*domain.User, error) {
+	if user, ok := repo.cache.Get(id); ok {
+		return user, nil
+	}
 	var user domain.User
 	row := repo.db.QueryRow("SELECT * FROM user WHERE id=?", id)
 	scanErr := row.Scan(&user.Id, &user.Name, &user.Email, &user.Password, &user.Role)
 	if scanErr != nil {
 		return nil, scanErr
 	}
-
+	repo.cache.Add(id, &user)
 	return &user, nil
 }
 
 func (repo *DbUserRepo) FindByIdInt(id int64) (*domain.User, error) {
+	if user, ok := repo.cache.Get(fmt.Sprintf("%d", id)); ok {
+		return user, nil
+	}
 	var user domain.User
 	row := repo.db.QueryRow("SELECT * FROM user WHERE id=?", id)
 	scanErr := row.Scan(&user.Id, &user.Name, &user.Email, &user.Password, &user.Role)
 	if scanErr != nil {
 		return nil, scanErr
 	}
-
+	repo.cache.Add(fmt.Sprintf("%d", id), &user)
 	return &user, nil
 }
 

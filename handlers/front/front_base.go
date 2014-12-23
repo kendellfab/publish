@@ -43,7 +43,6 @@ func (f FrontBase) handleRoot(w http.ResponseWriter, r *http.Request) {
 	paginator := GetPagination(r, total, f.pageCount)
 	offset := paginator.Offset * paginator.Count
 	count := paginator.Count
-	log.Println("Offset:", offset, "Count:", count)
 	posts, err := f.rm.PostRepo.FindPublished(offset, count)
 
 	data := make(map[string]interface{})
