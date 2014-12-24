@@ -24,11 +24,14 @@
 				<h3 class="panel-title">Posts</h3>
 			</div>
 			<div class="panel-body">
-				<ul>
-					<li ng-repeat="p in series.posts">
-						<a href="/admin/post/||p.id||/edit">||p.title||</a>
-					</li>
-				</ul>
+				<table class="table table-bordered table-hover table-striped">
+					<tbody>
+						<tr ng-repeat="p in series.posts">
+							<td><a href="/admin/post/||p.id||/edit">||p.title||</a></td>
+							<td><a href="#" ng-click="removePost($index)">&times;</a></td>
+						</tr>
+					</tbody>
+				</table>
 			</div>
 		</div>
 	</div>

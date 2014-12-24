@@ -7,6 +7,10 @@ pubApp.controller("SeriesController", ["$scope", "res", function($scope, res) {
 		res.series.update($scope.series, success, error);
 	}
 
+	$scope.removePost = function(index) {
+		alert(index);
+	}
+
 	function success(result) {
 		$scope.saving = false;
 	}

@@ -75,5 +75,10 @@ func (f FrontPosts) handlePost(w http.ResponseWriter, r *http.Request) {
 		f.RenderError(w, r, 404, err.Error())
 		return
 	}
+
+	if series, sErr := f.rm.SeriesRepo.GetSeries(fmt.Sprintf("%d", post.SeriesId)); sErr == nil {
+		data["series"] = series
+	}
+
 	f.RenderTemplates(w, r, data, "post.html")
 }
