@@ -34,6 +34,12 @@ func (repo *DbSeriesRepo) Store(s *domain.Series) error {
 	return err
 }
 
+func (repo *DbSeriesRepo) Update(s *domain.Series) error {
+	up := "UPDATE series SET title=?, slug=?, created=?, description=? WHERE id = ?;"
+	_, err := repo.db.Exec(up, s.Title, s.Slug, s.Created.Format(time.RFC3339), s.Description, s.Id)
+	return err
+}
+
 func (repo *DbSeriesRepo) GetAll() ([]*domain.Series, error) {
 	sel := "SELECT id, title, slug, created, description FROM series;"
 	rows, qErr := repo.db.Query(sel)

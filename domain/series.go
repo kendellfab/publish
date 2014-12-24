@@ -12,17 +12,18 @@ type TimeSeries struct {
 
 type SeriesRepo interface {
 	Store(s *Series) error
+	Update(s *Series) error
 	GetAll() ([]*Series, error)
 	GetSeries(id string) (*Series, error)
 }
 
 type Series struct {
-	Id          int64
-	Title       string
-	Slug        string
-	Created     time.Time
-	Description string
-	Posts       []*Post
+	Id          int64     `json:"id"`
+	Title       string    `json:"title"`
+	Slug        string    `json:"slug"`
+	Created     time.Time `json:"created"`
+	Description string    `json:"description"`
+	Posts       []*Post   `json:"posts"`
 }
 
 func (s *Series) GenerateSlug() {

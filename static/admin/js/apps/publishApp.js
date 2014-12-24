@@ -23,8 +23,16 @@ pubApp.factory('res', ['$resource', function($resource){
 		}
 	});
 
+	var seriesResource = $resource("/admin/series/:id/:action", {id: "@id"}, {
+		update: {
+			method: "Post",
+			params: {action: "edit"}
+		}
+	});
+
 	return {
 		post: postResource,
-		uploads: uploadResource
+		uploads: uploadResource,
+		series: seriesResource
 	}
 }])
