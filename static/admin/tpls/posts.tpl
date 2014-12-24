@@ -18,6 +18,7 @@
 						<div class="col-lg-2">
 							<button type="submit" class="btn btn-primary">Save</button>
 						</div>
+					</div>
 				</form>
 			</div>
 		</div>

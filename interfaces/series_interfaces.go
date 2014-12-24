@@ -27,7 +27,10 @@ func (repo *DbSeriesRepo) init() {
 
 func (repo *DbSeriesRepo) Store(s *domain.Series) error {
 	ins := "INSERT INTO series(title, slug, created, description) VALUES(?, ?, ?, ?);"
-	_, err := repo.db.Exec(ins, s.Title, s.Slug, s.Created.Format(time.RFC3339), s.Description)
+	res, err := repo.db.Exec(ins, s.Title, s.Slug, s.Created.Format(time.RFC3339), s.Description)
+	if id, idErr := res.LastInsertId(); idErr == nil {
+		s.Id = id
+	}
 	return err
 }
 
