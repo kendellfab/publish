@@ -22,7 +22,6 @@ type PostRepo interface {
 	UnPublish(id int64) error
 	PublishedCount() (int, error)
 	PublishedCountCategory(catId int) (int, error)
-	AddToSeries(id, seriesId string) error
 	GetForSeries(seriesId string) ([]*Post, error)
 }
 
@@ -39,6 +38,7 @@ type Post struct {
 	Tags        []string  `json:"tags"`
 	Category    *Category `json:"category"`
 	Comments    []Comment `json:"comments"`
+	SeriesId    int64     `json:"seriesId"`
 }
 
 func (p *Post) GenerateSlug() {

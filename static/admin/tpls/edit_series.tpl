@@ -18,6 +18,19 @@
 		<div ng-show="saving" class="save-indicator">
 			<img src="/admin/img/ajax-loader.gif" /> <span>Saving...</span>
 		</div>
+
+		<div class="panel panel-default">
+			<div class="panel-heading">
+				<h3 class="panel-title">Posts</h3>
+			</div>
+			<div class="panel-body">
+				<ul>
+					<li ng-repeat="p in series.posts">
+						<a href="/admin/post/||p.id||/edit">||p.title||</a>
+					</li>
+				</ul>
+			</div>
+		</div>
 	</div>
 </div>
 </div>

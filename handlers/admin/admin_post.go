@@ -61,6 +61,10 @@ func (a AdminPost) handleEditPost(w http.ResponseWriter, r *http.Request) {
 		log.Println(cErr)
 	}
 
+	if series, sErr := a.rm.SeriesRepo.GetAll(); sErr == nil {
+		data["series"] = series
+	}
+
 	a.RenderTemplates(w, r, data, "base.tpl", "edit_post.tpl")
 }
 

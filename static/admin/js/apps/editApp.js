@@ -1,6 +1,7 @@
 pubApp.controller("EditController", ["$scope", "res", function($scope, res) {
 	$scope.post = backend.post;
 	$scope.cats = backend.cats;
+	$scope.series = backend.series;
 	$scope.saving = false;
 
 	$scope.uploads = res.uploads.list();

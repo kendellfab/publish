@@ -42,7 +42,7 @@ func (repo *DbPostRepo) Store(post *domain.Post) error {
 	createdStr := domain.SerializeDate(post.Created)
 	tagsStr, _ := domain.SerializeTags(post.Tags)
 	authorId := post.AuthorId
-	res, err := repo.db.Exec("INSERT INTO post(title, slug, author, created, content, type, published, tags, category, day, month, year) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);", post.Title, post.Slug, authorId, createdStr, post.Content, post.ContentType, published, tagsStr, 1, day, month, year)
+	res, err := repo.db.Exec("INSERT INTO post(title, slug, author, created, content, type, published, tags, category, day, month, year, series) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);", post.Title, post.Slug, authorId, createdStr, post.Content, post.ContentType, published, tagsStr, 1, day, month, year, post.SeriesId)
 	if err == nil {
 		if id, idErr := res.LastInsertId(); idErr == nil {
 			post.Id = id
@@ -53,12 +53,12 @@ func (repo *DbPostRepo) Store(post *domain.Post) error {
 
 func (repo *DbPostRepo) Update(post *domain.Post) error {
 	tags, _ := domain.SerializeTags(post.Tags)
-	sql := "UPDATE post SET title=?, slug=?, content=?, type=?, tags=?, category=? WHERE id = ?"
+	sql := "UPDATE post SET title=?, slug=?, content=?, type=?, tags=?, category=?, series=? WHERE id = ?"
 	catId := 1
 	if post.Category != nil {
 		catId = post.Category.Id
 	}
-	_, err := repo.db.Exec(sql, post.Title, post.Slug, post.Content, post.ContentType, tags, catId, post.Id)
+	_, err := repo.db.Exec(sql, post.Title, post.Slug, post.Content, post.ContentType, tags, catId, post.SeriesId, post.Id)
 
 	return err
 }
@@ -76,13 +76,13 @@ func (repo *DbPostRepo) UnPublish(id int64) error {
 }
 
 func (repo *DbPostRepo) FindById(id int64) (*domain.Post, error) {
-	sql := "SELECT id, title, slug, author, created, content, type, published, tags, category FROM post WHERE id=?"
+	sql := "SELECT id, title, slug, author, created, content, type, published, tags, category, series FROM post WHERE id=?"
 	row := repo.db.QueryRow(sql, id)
 	return repo.scanPost(row)
 }
 
 func (repo *DbPostRepo) FindByIdString(id string) (*domain.Post, error) {
-	sql := "SELECT id, title, slug, author, created, content, type, published, tags, category FROM post WHERE id=?"
+	sql := "SELECT id, title, slug, author, created, content, type, published, tags, category, series FROM post WHERE id=?"
 	row := repo.db.QueryRow(sql, id)
 	return repo.scanPost(row)
 }
@@ -91,13 +91,13 @@ func (repo *DbPostRepo) FindBySlug(slug string) (*domain.Post, error) {
 	if post, ok := repo.cache.Get(slug); ok {
 		return post, nil
 	}
-	sql := "SELECT id, title, slug, author, created, content, type, published, tags, category FROM post WHERE slug=?"
+	sql := "SELECT id, title, slug, author, created, content, type, published, tags, category, series FROM post WHERE slug=?"
 	row := repo.db.QueryRow(sql, slug)
 	return repo.scanPost(row)
 }
 
 func (repo *DbPostRepo) FindByCategory(category *domain.Category, offset, limit int) ([]*domain.Post, error) {
-	sql := "SELECT id, title, slug, author, created, content, type, published, tags, category FROM post WHERE category=? AND published = 1 ORDER BY created DESC LIMIT ? OFFSET ?;"
+	sql := "SELECT id, title, slug, author, created, content, type, published, tags, category, series FROM post WHERE category=? AND published = 1 ORDER BY created DESC LIMIT ? OFFSET ?;"
 	rows, qError := repo.db.Query(sql, category.Id, limit, offset)
 	if qError != nil {
 		return nil, qError
@@ -107,7 +107,7 @@ func (repo *DbPostRepo) FindByCategory(category *domain.Category, offset, limit 
 }
 
 func (repo *DbPostRepo) FindAll() ([]*domain.Post, error) {
-	sql := "SELECT id, title, slug, author, created, content, type, published, tags, category FROM post ORDER BY created DESC;"
+	sql := "SELECT id, title, slug, author, created, content, type, published, tags, category, series FROM post ORDER BY created DESC;"
 	rows, qError := repo.db.Query(sql)
 	if qError != nil {
 		return nil, qError
@@ -160,10 +160,10 @@ func (repo *DbPostRepo) FindPublished(offset, limit int) ([]*domain.Post, error)
 	var qError error
 
 	if len(faults) == len(ids) {
-		sel := "SELECT id, title, slug, author, created, content, type, published, tags, category FROM post WHERE published = 1 ORDER BY created DESC LIMIT ? OFFSET ?;"
+		sel := "SELECT id, title, slug, author, created, content, type, published, tags, category, series FROM post WHERE published = 1 ORDER BY created DESC LIMIT ? OFFSET ?;"
 		rows, qError = repo.db.Query(sel, limit, offset)
 	} else {
-		sel := "SELECT id, title, slug, author, created, content, type, published, tags, category FROM post WHERE slug IN(%s) ORDER BY created DESC;"
+		sel := "SELECT id, title, slug, author, created, content, type, published, tags, category, series FROM post WHERE slug IN(%s) ORDER BY created DESC;"
 		phs := fmt.Sprintf(sel, GetPlaceholders(faults))
 		rows, qError = repo.db.Query(phs, faults...)
 	}
@@ -176,8 +176,17 @@ func (repo *DbPostRepo) FindPublished(offset, limit int) ([]*domain.Post, error)
 	return append(posts, results...), nil
 }
 
+func (repo *DbPostRepo) GetForSeries(seriesId string) ([]*domain.Post, error) {
+	sel := "SELECT id, title, slug, author, created, content, type, published, tags, category, series FROM post WHERE published = 1 AND series = ? ORDER BY created DESC;"
+	rows, qErr := repo.db.Query(sel, seriesId)
+	if qErr != nil {
+		return nil, qErr
+	}
+	return repo.scanPosts(rows), nil
+}
+
 func (repo *DbPostRepo) FindByYearMonth(year, month string) ([]*domain.Post, error) {
-	sel := "SELECT id, title, slug, author, created, content, type, published, tags, category FROM post WHERE published = 1 AND year = ? AND month = ? ORDER BY created DESC;"
+	sel := "SELECT id, title, slug, author, created, content, type, published, tags, category, series FROM post WHERE published = 1 AND year = ? AND month = ? ORDER BY created DESC;"
 	rows, qError := repo.db.Query(sel, year, month)
 	if qError != nil {
 		return nil, qError
@@ -187,7 +196,7 @@ func (repo *DbPostRepo) FindByYearMonth(year, month string) ([]*domain.Post, err
 }
 
 func (repo *DbPostRepo) FindDashboard(offset, limit int) ([]*domain.Post, error) {
-	sel := "SELECT id, title, slug, author, created, content, type, published, tags, category FROM post ORDER BY created DESC LIMIT ? OFFSET ?;"
+	sel := "SELECT id, title, slug, author, created, content, type, published, tags, category, series FROM post ORDER BY created DESC LIMIT ? OFFSET ?;"
 	rows, qError := repo.db.Query(sel, limit, offset)
 	if qError != nil {
 		return nil, qError
@@ -224,14 +233,6 @@ func (repo *DbPostRepo) PublishedCountCategory(catId int) (int, error) {
 	return count, nil
 }
 
-func (repo *DbPostRepo) AddToSeries(id, seriesId string) error {
-	return nil
-}
-
-func (repo *DbPostRepo) GetForSeries(seriesId string) ([]*domain.Post, error) {
-	return nil, nil
-}
-
 func (repo *DbPostRepo) scanPost(row *sql.Row) (*domain.Post, error) {
 	var post domain.Post
 	var authorId int64
@@ -239,7 +240,7 @@ func (repo *DbPostRepo) scanPost(row *sql.Row) (*domain.Post, error) {
 	var tagString string
 	var published int
 	var categoryId int
-	scanErr := row.Scan(&post.Id, &post.Title, &post.Slug, &authorId, &createString, &post.Content, &post.ContentType, &published, &tagString, &categoryId)
+	scanErr := row.Scan(&post.Id, &post.Title, &post.Slug, &authorId, &createString, &post.Content, &post.ContentType, &published, &tagString, &categoryId, &post.SeriesId)
 	if scanErr != nil {
 		return nil, scanErr
 	}
@@ -264,6 +265,7 @@ func (repo *DbPostRepo) scanPost(row *sql.Row) (*domain.Post, error) {
 
 func (repo *DbPostRepo) scanPosts(rows *sql.Rows) []*domain.Post {
 	posts := make([]*domain.Post, 0)
+	rows.Next()
 	for {
 		var post domain.Post
 		var authorId int64
@@ -271,7 +273,7 @@ func (repo *DbPostRepo) scanPosts(rows *sql.Rows) []*domain.Post {
 		var tagsString string
 		var published int
 		var categoryId int
-		scanErr := rows.Scan(&post.Id, &post.Title, &post.Slug, &authorId, &createString, &post.Content, &post.ContentType, &published, &tagsString, &categoryId)
+		scanErr := rows.Scan(&post.Id, &post.Title, &post.Slug, &authorId, &createString, &post.Content, &post.ContentType, &published, &tagsString, &categoryId, &post.SeriesId)
 
 		if scanErr == nil {
 			author, err := repo.authorRepo.FindByIdInt(authorId)
@@ -294,6 +296,8 @@ func (repo *DbPostRepo) scanPosts(rows *sql.Rows) []*domain.Post {
 			}
 			posts = append(posts, &post)
 			repo.cache.Add(post.Slug, &post)
+		} else {
+			log.Println("Scan Posts:", scanErr.Error())
 		}
 
 		if !rows.Next() {

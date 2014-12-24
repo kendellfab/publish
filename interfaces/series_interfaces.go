@@ -78,5 +78,11 @@ func (repo *DbSeriesRepo) GetSeries(id string) (*domain.Series, error) {
 
 	s.Created, _ = time.Parse(time.RFC3339, created)
 
+	if posts, pErr := repo.postRepo.GetForSeries(id); pErr == nil {
+		s.Posts = posts
+	} else {
+		log.Println("Series:", pErr)
+	}
+
 	return &s, nil
 }

@@ -39,6 +39,16 @@
 				</select>
 			</div>
         </div>
+        <div class="panel panel-default">
+			<div class="panel-heading">
+				<h3 class="panel-title">Series</h3>
+			</div>
+			<div class="panel-body">
+				<select ng-model="post.seriesId" ng-options="s.id as s.title for s in series">
+					<option value="">-- choose series --</option>
+				</select>
+			</div>
+        </div>
 	</div>
 </div>
 
@@ -81,6 +91,7 @@
 <script language="JavaScript">
 	var backend = {};
 	backend.post = {{ marshal .post }};
+	backend.series = {{ marshal .series }};
 	{{ if .cats }}
 	backend.cats = {{ marshal .cats }};
 	{{ end }}
