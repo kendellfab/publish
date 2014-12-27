@@ -15,6 +15,7 @@ type SeriesRepo interface {
 	Update(s *Series) error
 	GetAll() ([]*Series, error)
 	GetSeries(id string) (*Series, error)
+	GetSeriesWithSlug(slug string) (*Series, error)
 }
 
 type Series struct {

@@ -1,6 +1,7 @@
 port = 8181
 site = "KendellFabrici.us"
 per_page = 5
+cache_tpls = false
 admin = "../static/admin"
 theme = "../static/hyde"
 upload = "/home/kendell/Desktop/uploads"

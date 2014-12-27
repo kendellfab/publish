@@ -71,6 +71,7 @@ func main() {
 	frontBase := front.NewFrontBase(frontendRender, repoManager, config)
 	frontPosts := front.NewFrontPosts(&frontBase)
 	frontCategories := front.NewFrontCategories(&frontBase)
+	frontSeries := front.NewFrontSeries(&frontBase)
 
 	app := milo.NewMiloApp(milo.SetPort(config.Port))
 
@@ -83,6 +84,7 @@ func main() {
 	frontBase.RegisterRoutes(app)
 	frontPosts.RegisterRoutes(app)
 	frontCategories.RegisterRoutes(app)
+	frontSeries.RegisterRoutes(app)
 
 	app.RouteAssetStripPrefix("/admin", config.AdminDir)
 	app.RouteAsset("/css", config.ThemeDir)

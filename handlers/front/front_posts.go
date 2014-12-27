@@ -38,7 +38,7 @@ func (f FrontPosts) handleYear(w http.ResponseWriter, r *http.Request) {
 	data := make(map[string]interface{})
 	data["series"] = series
 
-	f.RenderTemplates(w, r, data, "time_series.html")
+	f.RenderTemplates(w, r, data, "series_time.html")
 }
 
 func (f FrontPosts) handleMonth(w http.ResponseWriter, r *http.Request) {
@@ -55,7 +55,7 @@ func (f FrontPosts) handleMonth(w http.ResponseWriter, r *http.Request) {
 	data["series"] = series
 	data["error"] = pErr
 
-	f.RenderTemplates(w, r, data, "time_series.html")
+	f.RenderTemplates(w, r, data, "series_time.html")
 }
 
 func (f FrontPosts) handlePost(w http.ResponseWriter, r *http.Request) {

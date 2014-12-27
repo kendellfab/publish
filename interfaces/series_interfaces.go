@@ -2,6 +2,7 @@ package interfaces
 
 import (
 	"database/sql"
+	"fmt"
 	"github.com/kendellfab/publish/domain"
 	"log"
 	"strings"
@@ -69,6 +70,17 @@ func (repo *DbSeriesRepo) GetSeries(id string) (*domain.Series, error) {
 	sel := "SELECT id, title, slug, created, description FROM series WHERE id = ?;"
 	row := repo.db.QueryRow(sel, id)
 
+	return repo.scanSingleSeries(row)
+}
+
+func (repo *DbSeriesRepo) GetSeriesWithSlug(slug string) (*domain.Series, error) {
+	sel := "SELECT id, title, slug, created, description FROM series WHERE slug = ?;"
+	row := repo.db.QueryRow(sel, slug)
+
+	return repo.scanSingleSeries(row)
+}
+
+func (repo *DbSeriesRepo) scanSingleSeries(row *sql.Row) (*domain.Series, error) {
 	var s domain.Series
 	var created string
 	sErr := row.Scan(&s.Id, &s.Title, &s.Slug, &created, &s.Description)
@@ -78,7 +90,7 @@ func (repo *DbSeriesRepo) GetSeries(id string) (*domain.Series, error) {
 
 	s.Created, _ = time.Parse(time.RFC3339, created)
 
-	if posts, pErr := repo.postRepo.GetForSeries(id); pErr == nil {
+	if posts, pErr := repo.postRepo.GetForSeries(fmt.Sprintf("%d", s.Id)); pErr == nil {
 		s.Posts = posts
 	} else {
 		log.Println("Series:", pErr)
