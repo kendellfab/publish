@@ -21,15 +21,18 @@ func (f FrontSeries) RegisterRoutes(app *milo.Milo) {
 }
 
 func (f FrontSeries) handleSeries(w http.ResponseWriter, r *http.Request) {
-
+	data := make(map[string]interface{})
+	series, sErr := f.rm.SeriesRepo.GetAll()
+	data["series"] = series
+	data["error"] = sErr
+	f.RenderTemplates(w, r, data, "series_all.html")
 }
 
 func (f FrontSeries) handleSingleSeries(w http.ResponseWriter, r *http.Request) {
 	slug := mux.Vars(r)["slug"]
+	data := make(map[string]interface{})
 	series, err := f.rm.SeriesRepo.GetSeriesWithSlug(slug)
-	if err != nil {
-		f.RenderError(w, r, 500, err.Error())
-		return
-	}
-	f.RenderJson(w, r, series)
+	data["series"] = series
+	data["error"] = err
+	f.RenderTemplates(w, r, data, "series_one.html")
 }

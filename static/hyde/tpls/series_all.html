@@ -1,7 +1,8 @@
 {{ partial "head.html" . }}
 <div class="content container">
 	{{ range .series }}
-		<h1>{{ fmt_date .When "Jan 2006" }}</h1>
+		<h1><a href="/series/{{ .Slug }}">{{ .Title }}</a></h1>
+		<h3>{{ fmt_date .Created "Jan 2006" }}</h3>
 		<hr />
 	  	<div class="posts">
 		{{ range .Posts}}
@@ -10,8 +11,6 @@
 		        <a href="{{ .Permalink }}">{{ .Title }}</a>
 		      </h2>
 		      <span class="post-date">{{ .Created.Format "Jan 2, 2006 15:04:05" }} &middot; <a href="/category/{{ .Category.Slug }}">{{ .Category.Title }}</a></span>
-		      <p>{{ rend_md .Description }}</p>
-		      <a href="{{ .Permalink }}">Read On &rarr;</a>
 		    </div>
 	    {{ end }}
 	  	</div>

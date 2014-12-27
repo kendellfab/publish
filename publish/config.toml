@@ -1,5 +1,5 @@
 port = 8181
-site = "KendellFabrici.us"
+site = "Publish Blog Engine"
 per_page = 5
 cache_tpls = false
 admin = "../static/admin"

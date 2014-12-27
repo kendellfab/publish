@@ -42,7 +42,7 @@ func (repo *DbSeriesRepo) Update(s *domain.Series) error {
 }
 
 func (repo *DbSeriesRepo) GetAll() ([]*domain.Series, error) {
-	sel := "SELECT id, title, slug, created, description FROM series;"
+	sel := "SELECT id, title, slug, created, description FROM series ORDER BY created DESC;"
 	rows, qErr := repo.db.Query(sel)
 	if qErr != nil {
 		return nil, qErr
@@ -56,6 +56,9 @@ func (repo *DbSeriesRepo) GetAll() ([]*domain.Series, error) {
 		sErr := rows.Scan(&s.Id, &s.Title, &s.Slug, &created, &s.Description)
 		if sErr == nil {
 			s.Created, _ = time.Parse(time.RFC3339, created)
+			if posts, pErr := repo.postRepo.GetForSeries(fmt.Sprintf("%d", s.Id)); pErr == nil {
+				s.Posts = posts
+			}
 			series = append(series, &s)
 		}
 		if !rows.Next() {

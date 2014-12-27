@@ -89,6 +89,7 @@ func main() {
 	app.RouteAssetStripPrefix("/admin", config.AdminDir)
 	app.RouteAsset("/css", config.ThemeDir)
 	app.RouteAsset("/js", config.ThemeDir)
+	app.RouteAsset("/img", config.ThemeDir)
 	app.RouteAssetStripPrefix("/uploads", config.UploadDir)
 
 	app.Run()
