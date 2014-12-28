@@ -34,7 +34,8 @@ func (a AdminPost) RegisterRoutes(app *milo.Milo) {
 func (a AdminPost) handlePosts(w http.ResponseWriter, r *http.Request) {
 	posts, err := a.rm.PostRepo.FindAll()
 
-	data := make(map[string]interface{})
+	// data := make(map[string]interface{})
+	data := a.setupActive("post")
 	data["posts"] = posts
 	if err != nil {
 		data["error"] = err
@@ -48,7 +49,8 @@ func (a AdminPost) handleEditPost(w http.ResponseWriter, r *http.Request) {
 	idStr := mux.Vars(r)["id"]
 	post, err := a.rm.PostRepo.FindByIdString(idStr)
 
-	data := make(map[string]interface{})
+	// data := make(map[string]interface{})
+	data := a.setupActive("post")
 	data["post"] = post
 	if err != nil {
 		data["error"] = err

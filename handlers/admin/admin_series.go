@@ -29,7 +29,8 @@ func (a AdminSeries) RegisterRoutes(app *milo.Milo) {
 }
 
 func (a AdminSeries) handleSeries(w http.ResponseWriter, r *http.Request) {
-	data := make(map[string]interface{})
+	// data := make(map[string]interface{})
+	data := a.setupActive("series")
 	series, err := a.rm.SeriesRepo.GetAll()
 	if err == nil {
 		data["series"] = series
@@ -39,7 +40,8 @@ func (a AdminSeries) handleSeries(w http.ResponseWriter, r *http.Request) {
 
 func (a AdminSeries) handleSeriesEdit(w http.ResponseWriter, r *http.Request) {
 	id := mux.Vars(r)["id"]
-	data := make(map[string]interface{})
+	// data := make(map[string]interface{})
+	data := a.setupActive("series")
 	if series, err := a.rm.SeriesRepo.GetSeries(id); err == nil {
 		data["series"] = series
 	}

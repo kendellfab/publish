@@ -23,6 +23,7 @@
     <link href="/admin/font-awesome-4.1.0/css/font-awesome.min.css" rel="stylesheet" type="text/css">
 
     <link href="/admin/css/publish.css" rel="stylesheet" type="text/css">
+    <link href="/img/favicon.png" rel="icon">
 
     <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
     <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
@@ -146,19 +147,19 @@
             <!-- Sidebar Menu Items - These collapse to the responsive navigation menu on small screens -->
             <div class="collapse navbar-collapse navbar-ex1-collapse">
                 <ul class="nav navbar-nav side-nav">
-                    <li>
+                    <li {{ if eq .active "dash" }}class="active"{{ end }}>
                         <a href="/admin"><i class="fa fa-fw fa-dashboard"></i> Dashboard</a>
                     </li>
-                    <li>
+                    <li {{ if eq .active "post"}}class="active"{{ end }}>
                         <a href="/admin/posts"><i class="fa fa-fw fa-file-text-o"></i> Posts</a>
                     </li>
-                    <li>
+                    <li {{ if eq .active "cat"}}class="active"{{ end }}>
                         <a href="/admin/cats"><i class="fa fa-fw fa-tags"></i> Categories</a>
                     </li>
-                    <li>
+                    <li {{ if eq .active "up"}}class="active"{{ end }}>
                         <a href="/admin/uploads"><i class="fa fa-fw fa-cloud-upload"></i> Uploads</a>
                     </li>
-                    <li>
+                    <li {{ if eq .active "series"}}class="active"{{ end }}>
                         <a href="/admin/series"><i class="fa fa-fw fa-sort-amount-desc"></i> Series</a>
                     </li>
                     <!-- <li>

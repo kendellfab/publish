@@ -28,7 +28,8 @@ func (a AdminUpload) RegisterRoutes(app *milo.Milo) {
 }
 
 func (a AdminUpload) handleUploads(w http.ResponseWriter, r *http.Request) {
-	data := make(map[string]interface{})
+	// data := make(map[string]interface{})
+	data := a.setupActive("up")
 	data["files"], data["error"] = a.rm.UploadRepo.ListFiles()
 	a.RenderTemplates(w, r, data, "base.tpl", "uploads.tpl")
 }

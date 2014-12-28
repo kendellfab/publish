@@ -25,7 +25,8 @@ func (a AdminCat) RegisterRoutes(app *milo.Milo) {
 
 func (a AdminCat) handlePosts(w http.ResponseWriter, r *http.Request) {
 	cats, err := a.rm.CategoryRepo.GetAll()
-	data := make(map[string]interface{})
+	// data := make(map[string]interface{})
+	data := a.setupActive("cat")
 	data["cats"] = cats
 	data["error"] = err
 	a.RenderTemplates(w, r, data, "base.tpl", "cats.tpl")

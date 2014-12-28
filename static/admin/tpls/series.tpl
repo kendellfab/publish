@@ -1,7 +1,13 @@
 {{ define "Content" }}
 <div class="row">
+    <div class="col-lg-12">
+        <h1 class="page-header">
+            Series
+        </h1>
+    </div>
+</div>
+<div class="row">
 	<div class="col-lg-4">
-		<h3>Series</h3>
 	</div>
 	<div class="col-lg-8">
 		<div class="panel panel-default">

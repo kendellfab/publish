@@ -26,7 +26,8 @@ func (a AdminGeneral) RegisterRoutes(app *milo.Milo) {
 }
 
 func (a AdminGeneral) handleAdmin(w http.ResponseWriter, r *http.Request) {
-	data := make(map[string]interface{})
+	// data := make(map[string]interface{})
+	data := a.setupActive("dash")
 	recent, recentErr := a.rm.PostRepo.FindDashboard(0, 10)
 	data["recent"] = recent
 	data["recent_error"] = recentErr

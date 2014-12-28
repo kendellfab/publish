@@ -1,7 +1,13 @@
 {{ define "Content" }}
 <div class="row">
+    <div class="col-lg-12">
+        <h1 class="page-header">
+            Posts
+        </h1>
+    </div>
+</div>
+<div class="row">
 	<div class="col-lg-4">
-		<h3>Posts</h3>
 		<p>All: {{ len .posts }}<p>
 	</div>
 	<div class="col-lg-8">
