@@ -26,8 +26,14 @@ func (repo *DbPageRepo) init() {
 
 func (repo *DbPageRepo) Store(page *domain.Page) error {
 	createdString := domain.SerializeDate(page.Created)
-	_, err := repo.db.Exec("INSERT INTO page(title, slug, created, content, published) VALUES(?, ?, ?, ?, 0)", page.Title, page.Slug, createdString, page.Content)
-	return err
+	res, err := repo.db.Exec("INSERT INTO page(title, slug, created, content, published) VALUES(?, ?, ?, ?, 0)", page.Title, page.Slug, createdString, page.Content)
+	if err != nil {
+		return err
+	}
+	if id, idErr := res.LastInsertId(); idErr == nil {
+		page.Id = id
+	}
+	return nil
 }
 
 func (repo *DbPageRepo) Update(page *domain.Page) error {
@@ -40,7 +46,7 @@ func (repo *DbPageRepo) Update(page *domain.Page) error {
 	return err
 }
 
-func (repo *DbPageRepo) FindById(id int) (*domain.Page, error) {
+func (repo *DbPageRepo) FindById(id string) (*domain.Page, error) {
 	raw := "SELECT id, title, slug, created, content, published FROM page WHERE id = ?"
 	row := repo.db.QueryRow(raw, id)
 	return repo.parseRow(row)
@@ -52,46 +58,46 @@ func (repo *DbPageRepo) FindBySlug(slug string) (*domain.Page, error) {
 	return repo.parseRow(row)
 }
 
-func (repo *DbPageRepo) FindAll() (*[]domain.Page, error) {
+func (repo *DbPageRepo) FindAll() ([]*domain.Page, error) {
 	sql := "SELECT id, title, slug, created, content, published FROM page"
 	rows, qError := repo.db.Query(sql)
 	if qError != nil {
 		return nil, qError
 	}
 	pages := repo.parseRows(rows)
-	return &pages, nil
+	return pages, nil
 }
 
-func (repo *DbPageRepo) FindAllPublished() (*[]domain.Page, error) {
+func (repo *DbPageRepo) FindAllPublished() ([]*domain.Page, error) {
 	sql := "SELECT id, title, slug, created, content, published FROM page WHERE published = 1"
 	rows, qError := repo.db.Query(sql)
 	if qError != nil {
 		return nil, qError
 	}
 	pages := repo.parseRows(rows)
-	return &pages, nil
+	return pages, nil
 }
 
-func (repo *DbPageRepo) Publish(id int) error {
+func (repo *DbPageRepo) Publish(id string) error {
 	sql := "UPDATE page SET published = 1 WHERE id = ?"
 	_, err := repo.db.Exec(sql, id)
 	return err
 }
 
-func (repo *DbPageRepo) UnPublish(id int) error {
+func (repo *DbPageRepo) UnPublish(id string) error {
 	sql := "UPDATE page SET published = 0 WHERE id = ?"
 	_, err := repo.db.Exec(sql, id)
 	return err
 }
 
-func (repo *DbPageRepo) Delete(id int) error {
+func (repo *DbPageRepo) Delete(id string) error {
 	sql := "DELETE FROM page WHERE id = ?"
 	_, err := repo.db.Exec(sql, id)
 	return err
 }
 
-func (repo *DbPageRepo) parseRows(rows *sql.Rows) []domain.Page {
-	pages := make([]domain.Page, 0)
+func (repo *DbPageRepo) parseRows(rows *sql.Rows) []*domain.Page {
+	pages := make([]*domain.Page, 0)
 	for {
 		var page domain.Page
 		var createdStr string
@@ -105,7 +111,7 @@ func (repo *DbPageRepo) parseRows(rows *sql.Rows) []domain.Page {
 			if published == 1 {
 				page.Published = true
 			}
-			pages = append(pages, page)
+			pages = append(pages, &page)
 		}
 		if !rows.Next() {
 			break

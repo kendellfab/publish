@@ -15,6 +15,17 @@ pubApp.factory('res', ['$resource', function($resource){
 		}
 	});
 
+	var pageResource = $resource("/admin/pages/:id/:action", {id: "@id"}, {
+		update: {
+			method: "Post",
+			params: {action: "edit"}
+		},
+		publish: {
+			method: "Post",
+			params: {action: "publish"}
+		}
+	})
+
 	var uploadResource = $resource("/admin/uploads/:id/:action", {}, {
 		list: {
 			method: "Get",
@@ -32,6 +43,7 @@ pubApp.factory('res', ['$resource', function($resource){
 
 	return {
 		post: postResource,
+		page: pageResource,
 		uploads: uploadResource,
 		series: seriesResource
 	}

@@ -7,6 +7,7 @@ import (
 	"log"
 	"net"
 	"net/http"
+	"strings"
 	"time"
 )
 
@@ -25,6 +26,7 @@ func NewFrontBase(rend *milo.Renderer, rm usecases.RepoManager, c domain.Config)
 
 func (f FrontBase) RegisterRoutes(app *milo.Milo) {
 	app.Route("/", nil, f.handleRoot)
+	app.PathPrefix("/", nil, f.handlePages)
 }
 
 func (f FrontBase) RenderTemplates(w http.ResponseWriter, r *http.Request, data map[string]interface{}, tpls ...string) {
@@ -53,6 +55,23 @@ func (f FrontBase) handleRoot(w http.ResponseWriter, r *http.Request) {
 		data["error"] = err
 	}
 	f.RenderTemplates(w, r, data, "index.html")
+}
+
+func (f FrontBase) handlePages(w http.ResponseWriter, r *http.Request) {
+
+	path := strings.Split(r.RequestURI, "/")[1:]
+	log.Println("Len:", len(path), "Path:", path)
+
+	data := make(map[string]interface{})
+	page, err := f.rm.PageRepo.FindBySlug(path[0])
+	if err == nil {
+		data["page"] = page
+	} else {
+		log.Println(err)
+	}
+
+	f.RenderTemplates(w, r, data, "page.html")
+
 }
 
 func (f FrontBase) getIp(r *http.Request) string {

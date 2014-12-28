@@ -7,18 +7,18 @@ import (
 
 type PageRepo interface {
 	Store(page *Page) error
-	FindById(id int) (*Page, error)
+	FindById(id string) (*Page, error)
 	FindBySlug(slug string) (*Page, error)
-	FindAll() (*[]Page, error)
+	FindAll() ([]*Page, error)
 	Update(page *Page) error
-	Publish(id int) error
-	UnPublish(id int) error
-	Delete(id int) error
-	FindAllPublished() (*[]Page, error)
+	Publish(id string) error
+	UnPublish(id string) error
+	Delete(id string) error
+	FindAllPublished() ([]*Page, error)
 }
 
 type Page struct {
-	Id        int       `json:"id"`
+	Id        int64     `json:"id"`
 	Title     string    `json:"title"`
 	Slug      string    `json:"slug"`
 	Created   time.Time `json:"created"`

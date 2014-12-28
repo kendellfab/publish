@@ -67,6 +67,7 @@ func main() {
 	adminUpload := admin.NewAdminUpload(&adminBase, repoManager)
 	adminForgot := admin.NewAdminForgot(&adminBase, repoManager, emailMessenger)
 	adminSeries := admin.NewAdminSeries(&adminBase, repoManager)
+	adminPages := admin.NewAdminPages(&adminBase, repoManager)
 
 	frontBase := front.NewFrontBase(frontendRender, repoManager, config)
 	frontPosts := front.NewFrontPosts(&frontBase)
@@ -75,22 +76,31 @@ func main() {
 
 	app := milo.NewMiloApp(milo.SetPort(config.Port))
 
+	// Setting up the routing in a particular way...
+	// First the admin routes, as they are all reserved for the admin of course.
 	adminGen.RegisterRoutes(app)
 	adminPosts.RegisterRoutes(app)
 	adminCat.RegisterRoutes(app)
 	adminUpload.RegisterRoutes(app)
 	adminForgot.RegisterRoutes(app)
 	adminSeries.RegisterRoutes(app)
-	frontBase.RegisterRoutes(app)
-	frontPosts.RegisterRoutes(app)
-	frontCategories.RegisterRoutes(app)
-	frontSeries.RegisterRoutes(app)
+	adminPages.RegisterRoutes(app)
 
+	// Now routing the assets, because we're doing a catch all serve of files for the admin app
 	app.RouteAssetStripPrefix("/admin", config.AdminDir)
 	app.RouteAsset("/css", config.ThemeDir)
 	app.RouteAsset("/js", config.ThemeDir)
 	app.RouteAsset("/img", config.ThemeDir)
 	app.RouteAssetStripPrefix("/uploads", config.UploadDir)
+
+	// Setting up all of the front end routes
+	frontPosts.RegisterRoutes(app)
+	frontCategories.RegisterRoutes(app)
+	frontSeries.RegisterRoutes(app)
+	// Registering the front base routes last, as we have the / (root) route
+	// and then / (prefix route) now we can catch all routes and see if we have a page.
+	// This makes it possible to have a dynamic route tree
+	frontBase.RegisterRoutes(app)
 
 	app.Run()
 }

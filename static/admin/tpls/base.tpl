@@ -153,6 +153,9 @@
                     <li {{ if eq .active "post"}}class="active"{{ end }}>
                         <a href="/admin/posts"><i class="fa fa-fw fa-file-text-o"></i> Posts</a>
                     </li>
+                    <li {{ if eq .active "pages"}}class="active"{{ end }}>
+                        <a href="/admin/pages"><i class="fa fa-fw fa-file-pdf-o"></i> Pages</a>
+                    </li>
                     <li {{ if eq .active "cat"}}class="active"{{ end }}>
                         <a href="/admin/cats"><i class="fa fa-fw fa-tags"></i> Categories</a>
                     </li>

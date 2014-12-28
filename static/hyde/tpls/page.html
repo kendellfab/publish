@@ -1,0 +1,10 @@
+{{ partial "head.html" . }}
+<div class="content container">
+{{ with .page }}
+<div class="post">
+	<h1>{{ .Title }}</h1>
+	{{ rend_md .Content }}
+</div>
+{{ end }}
+</div>
+{{ partial "foot.html" . }}
