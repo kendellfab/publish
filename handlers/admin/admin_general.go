@@ -80,6 +80,7 @@ func (a AdminGeneral) handleLogin(w http.ResponseWriter, r *http.Request) {
 
 		if usr, usrErr := a.rm.UserRepo.FindByEmail(email); usrErr == nil {
 			if passwrdErr := bcrypt.CompareHashAndPassword([]byte(usr.Password), []byte(password)); passwrdErr == nil {
+
 				a.doLogin(usr, w, r)
 				a.Redirect(w, r, "/admin", http.StatusSeeOther)
 				return
