@@ -68,6 +68,7 @@ func main() {
 	adminForgot := admin.NewAdminForgot(&adminBase, repoManager, emailMessenger)
 	adminSeries := admin.NewAdminSeries(&adminBase, repoManager)
 	adminPages := admin.NewAdminPages(&adminBase, repoManager)
+	adminUser := admin.NewAdminuser(&adminBase, repoManager)
 
 	frontBase := front.NewFrontBase(frontendRender, repoManager, config)
 	frontPosts := front.NewFrontPosts(&frontBase)
@@ -85,6 +86,7 @@ func main() {
 	adminForgot.RegisterRoutes(app)
 	adminSeries.RegisterRoutes(app)
 	adminPages.RegisterRoutes(app)
+	adminUser.RegisterRoutes(app)
 
 	// Now routing the assets, because we're doing a catch all serve of files for the admin app
 	app.RouteAssetStripPrefix("/admin", config.AdminDir)

@@ -35,7 +35,7 @@ func (u *User) IsAdmin() bool {
 }
 
 func (u *User) GenerateToken() {
-	k := make([]byte, 64)
+	k := make([]byte, 32)
 	io.ReadFull(rand.Reader, k)
 	u.Token = base64.StdEncoding.EncodeToString(k)
 }
