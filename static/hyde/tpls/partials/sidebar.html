@@ -11,6 +11,9 @@
 
     <ul class="sidebar-nav">
       <!-- <li class="sidebar-nav-item"><a href="{{ .Site.BaseUrl }}/">Blog</a></li> -->
+      {{ range .payload.Pages }}
+      <li class="sidebar-nav-item"><a href="/{{ .Slug }}">{{ .Title }}</a></li>
+      {{ end }}
       {{ range .payload.Categories }}
       <li class="sidebar-nav-item"><a href="/category/{{ .Slug }}">{{ .Title }} ({{ .Count }})</a></li>
       {{ end }}

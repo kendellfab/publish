@@ -28,6 +28,7 @@ func (a AdminPost) RegisterRoutes(app *milo.Milo) {
 	app.Route("/admin/post/{id:[0-9]+}/edit", []string{"Get"}, a.authMid(a.handleEditPost))
 	app.Route("/admin/post/{id:[0-9]+}/edit", []string{"Post"}, a.authMid(a.handleUpdatePost))
 	app.Route("/admin/post/{id:[0-9]+}/publish", []string{"Post"}, a.authMid(a.handlePublishPost))
+	app.Route("/admin/post/{id:[0-9]+}/delete", []string{"Get"}, a.authMid(a.handleDeletePost))
 	app.Route("/admin/post/start", []string{"Post"}, a.authMid(a.handleStartPost))
 }
 
@@ -146,4 +147,15 @@ func (a AdminPost) handleStartPost(w http.ResponseWriter, r *http.Request) {
 	}
 
 	a.Redirect(w, r, fmt.Sprintf("/admin/post/%d/edit", post.Id), http.StatusSeeOther)
+}
+
+func (a AdminPost) handleDeletePost(w http.ResponseWriter, r *http.Request) {
+	id := mux.Vars(r)["id"]
+	err := a.rm.PostRepo.Delete(id)
+	if err != nil {
+		a.setErrorFlash(w, r, err.Error())
+	} else {
+		a.setSuccessFlash(w, r, "Post Deleted")
+	}
+	a.Redirect(w, r, "/admin/posts", http.StatusSeeOther)
 }

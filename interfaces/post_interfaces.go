@@ -205,7 +205,7 @@ func (repo *DbPostRepo) FindDashboard(offset, limit int) ([]*domain.Post, error)
 	return posts, nil
 }
 
-func (repo *DbPostRepo) Delete(id int) error {
+func (repo *DbPostRepo) Delete(id string) error {
 	sql := "DELETE FROM post WHERE id = ?"
 	_, err := repo.db.Exec(sql, id)
 	return err

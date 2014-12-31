@@ -17,3 +17,7 @@ body .modal-scroll {
     overflow-y: scroll;
     max-height: 450px;
 }
+
+.full {
+	width: 100%;
+}

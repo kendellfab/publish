@@ -12,13 +12,13 @@
 		<div ui-ace="{useWrapMode: true, mode: 'markdown'}" ng-model="post.content"></div>
 	</div>
 	<div class="col-lg-3">
-		<button ng-click="savePost();" type="submit" style="width: 100%;" class="btn btn-primary">Save</button>
+		<button ng-click="savePost();" type="submit" class="btn btn-primary full">Save</button>
 		<br />
 		<br />
 		<div ng-show="saving" class="save-indicator">
 			<img src="/admin/img/ajax-loader.gif" /> <span>Saving...</span>
 		</div>
-		<button type="button" class="btn btn-success" style="width: 100%;" data-toggle="modal" data-target="#myModal">Uploads</button>
+		<button type="button" class="btn btn-success full" data-toggle="modal" data-target="#myModal">Uploads</button>
 		<br />
 		<br />
 		<div class="panel panel-default">
@@ -28,6 +28,14 @@
             <div class="panel-body">
 				<input type="checkbox" ng-click="publishClick()" ng-model="post.published" /> Publish
             </div>
+        </div>
+        <div class="panel panel-default">
+			<div class="panel-heading">
+				<h3 class="panel-title">Delete</h3>
+			</div>
+			<div class="panel-body">
+				<a href="/admin/post/{{ .post.Id }}/delete" class="btn btn-danger full">Delete</a>
+			</div>
         </div>
         <div class="panel panel-default">
 			<div class="panel-heading">

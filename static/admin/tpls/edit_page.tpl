@@ -18,7 +18,6 @@
 		<div ng-show="saving" class="save-indicator">
 			<img src="/admin/img/ajax-loader.gif" /> <span>Saving...</span>
 		</div>
-
 		<div class="panel panel-default">
             <div class="panel-heading">
                 <h3 class="panel-title"><i class="fa fa-fw fa-file-text-o"></i> Publish</h3>
@@ -26,6 +25,14 @@
             <div class="panel-body">
 				<input type="checkbox" ng-click="publishClick()" ng-model="page.published" /> Publish
             </div>
+        </div>
+        <div class="panel panel-default">
+			<div class="panel-heading">
+				<h3 class="panel-title">Delete</h3>
+			</div>
+			<div class="panel-body">
+				<a href="/admin/pages/{{ .page.Id }}/delete" class="btn btn-danger full">Delete</a>
+			</div>
         </div>
 	</div>
 </div>

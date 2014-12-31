@@ -8,4 +8,5 @@ type Payload struct {
 	Config      ConfigApp
 	Categories  []*Category
 	RecentPosts []*Post
+	Pages       []*Page
 }

@@ -17,7 +17,7 @@ type PostRepo interface {
 	FindPublished(offset, limit int) ([]*Post, error)
 	FindByYearMonth(year, month string) ([]*Post, error)
 	FindDashboard(offset, limit int) ([]*Post, error)
-	Delete(id int) error
+	Delete(id string) error
 	Publish(id int64) error
 	UnPublish(id int64) error
 	PublishedCount() (int, error)

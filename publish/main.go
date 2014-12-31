@@ -39,7 +39,7 @@ func main() {
 	repoManager.PostRepo = interfaces.NewDbPostRepo(db, repoManager.UserRepo, repoManager.CategoryRepo)
 	repoManager.ContactRepo = interfaces.NewDbContactRepo(db)
 	repoManager.PageRepo = interfaces.NewDbPageRepo(db)
-	repoManager.PayloadRepo = interfaces.NewPayloadRepo(config, repoManager.CategoryRepo, repoManager.PostRepo)
+	repoManager.PayloadRepo = interfaces.NewPayloadRepo(config, repoManager.CategoryRepo, repoManager.PostRepo, repoManager.PageRepo)
 	repoManager.ViewRepo = interfaces.NewDbViewRepo(db)
 	repoManager.ResetRepo = interfaces.NewDbResetRepo(db)
 	repoManager.SeriesRepo = interfaces.NewDbSeriesRepo(db, repoManager.PostRepo)

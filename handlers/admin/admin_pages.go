@@ -26,6 +26,7 @@ func (a AdminPages) RegisterRoutes(app *milo.Milo) {
 	app.Route("/admin/pages", []string{"Get"}, a.authMid(a.handlePages))
 	app.Route("/admin/pages/{id}/edit", []string{"Get"}, a.authMid(a.handlePageEdit))
 	app.Route("/admin/pages/{id}/edit", []string{"Post"}, a.authMid(a.handlePageUpdate))
+	app.Route("/admin/pages/{id}/delete", []string{"Get"}, a.authMid(a.handlePageDelete))
 	app.Route("/admin/pages/start", []string{"Post"}, a.authMid(a.handlePageStart))
 }
 
@@ -90,4 +91,15 @@ func (a AdminPages) handlePageStart(w http.ResponseWriter, r *http.Request) {
 
 	a.setSuccessFlash(w, r, "Page created.")
 	a.Redirect(w, r, fmt.Sprintf("/admin/pages/%d/edit", page.Id), http.StatusSeeOther)
+}
+
+func (a AdminPages) handlePageDelete(w http.ResponseWriter, r *http.Request) {
+	id := mux.Vars(r)["id"]
+	err := a.rm.PageRepo.Delete(id)
+	if err != nil {
+		a.setErrorFlash(w, r, err.Error())
+	} else {
+		a.setSuccessFlash(w, r, "Page deleted.")
+	}
+	a.Redirect(w, r, "/admin/pages", http.StatusSeeOther)
 }
