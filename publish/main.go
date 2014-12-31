@@ -75,7 +75,7 @@ func main() {
 	frontCategories := front.NewFrontCategories(&frontBase)
 	frontSeries := front.NewFrontSeries(&frontBase)
 
-	app := milo.NewMiloApp(milo.SetPort(config.Port))
+	app := milo.NewMiloApp(milo.SetBind(config.Address), milo.SetPort(config.Port))
 
 	// Setting up the routing in a particular way...
 	// First the admin routes, as they are all reserved for the admin of course.

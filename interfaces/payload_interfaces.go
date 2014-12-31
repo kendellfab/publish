@@ -18,7 +18,7 @@ func NewPayloadRepo(config domain.Config, cr domain.CategoryRepo, pr domain.Post
 
 func (p *PayloadRepoImpl) GetPayload() *domain.Payload {
 	pay := &domain.Payload{}
-	pay.Config = p.config
+	pay.Config = p.config.AppConfig
 
 	var wg sync.WaitGroup
 	wg.Add(2)

@@ -8,14 +8,14 @@ import (
 )
 
 type Config struct {
+	Address     string        `toml:"address"`
 	Port        int           `toml:"port"`
-	SiteName    string        `toml:"site"`
 	CacheTpls   bool          `toml:"cache_tpls"`
-	PerPage     int           `toml:"per_page"`
 	AdminDir    string        `toml:"admin"`
 	ThemeDir    string        `toml:"theme"`
 	SessionKeys []string      `toml:"session"`
 	UploadDir   string        `toml:"upload"`
+	AppConfig   ConfigApp     `toml:"app"`
 	Sqlite      *ConfigSqlite `toml:"sqlite"`
 	Mysql       *ConfigMysql  `toml:"mysql"`
 	Email       *ConfigEmail  `toml:"email"`
@@ -53,6 +53,12 @@ func EmailConfigEnvironmentOverride(prefix string, ce *ConfigEmail) *ConfigEmail
 		ce.From = from
 	}
 	return ce
+}
+
+type ConfigApp struct {
+	SiteName string `toml:"site"`
+	Tagline  string `toml:"tagline"`
+	PerPage  int    `toml:"per_page"`
 }
 
 type ConfigEmail struct {

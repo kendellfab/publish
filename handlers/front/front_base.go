@@ -20,7 +20,10 @@ type FrontBase struct {
 
 func NewFrontBase(rend *milo.Renderer, rm usecases.RepoManager, c domain.Config) FrontBase {
 	base := FrontBase{Renderer: rend, rm: rm, config: c}
-	base.pageCount = c.PerPage
+	base.pageCount = 10
+	if c.AppConfig.PerPage != 0 {
+		base.pageCount = c.AppConfig.PerPage
+	}
 	return base
 }
 

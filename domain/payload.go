@@ -5,7 +5,7 @@ type PayloadRepo interface {
 }
 
 type Payload struct {
-	Config      Config
+	Config      ConfigApp
 	Categories  []*Category
 	RecentPosts []*Post
 }

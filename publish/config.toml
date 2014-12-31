@@ -1,11 +1,14 @@
 port = 8181
-site = "Publish"
-per_page = 5
 cache_tpls = false
 admin = "../static/admin"
 theme = "../static/hyde"
 upload = "/home/kendell/Desktop/uploads"
 session = ["ADF@#$123Mdskoek"]
+
+[app]
+site = "Publish"
+tagline = "Go powered blog engine."
+per_page = 5
 
 [sqlite]
 path = "publish.db"
