@@ -72,3 +72,26 @@ func (pc *PostCache) Get(id string) (*domain.Post, bool) {
 	}
 	return nil, false
 }
+
+type PageCache struct {
+	*domain.LruCache
+}
+
+func NewPageCache(size int) (*PageCache, error) {
+	cache, err := domain.NewLruCache(size)
+	if err != nil {
+		return nil, err
+	}
+	return &PageCache{LruCache: cache}, nil
+}
+
+func (pc *PageCache) Add(id string, page *domain.Page) {
+	pc.LruCache.Add(id, page)
+}
+
+func (pc *PageCache) Get(id string) (*domain.Page, bool) {
+	if val, ok := pc.LruCache.Get(id); ok {
+		return val.(*domain.Page), true
+	}
+	return nil, false
+}
