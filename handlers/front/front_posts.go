@@ -5,6 +5,7 @@ import (
 	"github.com/gorilla/mux"
 	"github.com/kendellfab/milo"
 	"github.com/kendellfab/publish/domain"
+	"log"
 	"net/http"
 	"time"
 )
@@ -72,7 +73,8 @@ func (f FrontPosts) handlePost(w http.ResponseWriter, r *http.Request) {
 	if err == nil {
 		data["Post"] = post
 	} else {
-		f.RenderError(w, r, 404, err.Error())
+		log.Println("Post Error:", err)
+		f.RenderTemplates(w, r, nil, "404.html")
 		return
 	}
 

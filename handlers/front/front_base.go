@@ -33,12 +33,16 @@ func (f FrontBase) RegisterRoutes(app *milo.Milo) {
 }
 
 func (f FrontBase) RenderTemplates(w http.ResponseWriter, r *http.Request, data map[string]interface{}, tpls ...string) {
+	f.RenderTemplatesCode(w, r, 200, data, tpls...)
+}
+
+func (f FrontBase) RenderTemplatesCode(w http.ResponseWriter, r *http.Request, code int, data map[string]interface{}, tpls ...string) {
 	if data == nil {
 		data = make(map[string]interface{})
 	}
 	data["payload"] = f.rm.PayloadRepo.GetPayload()
 	data["Now"] = time.Now()
-	f.Renderer.RenderTemplates(w, r, data, tpls...)
+	f.Renderer.RenderTemplatesCode(w, r, code, data, tpls...)
 }
 
 func (f FrontBase) handleRoot(w http.ResponseWriter, r *http.Request) {
@@ -70,6 +74,8 @@ func (f FrontBase) handlePages(w http.ResponseWriter, r *http.Request) {
 	} else {
 		log.Println(err)
 		data["error"] = err
+		f.RenderTemplatesCode(w, r, 404, nil, "404.html")
+		return
 	}
 
 	f.RenderTemplates(w, r, data, "page.html")

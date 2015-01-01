@@ -26,6 +26,7 @@ There are just a few things to know about data in publish to get started.  There
 
 ### Post
 - Post
+- Series (Where applicable)
 - Error
 
 ### Series All
