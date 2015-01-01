@@ -69,6 +69,7 @@ func (f FrontBase) handlePages(w http.ResponseWriter, r *http.Request) {
 		data["page"] = page
 	} else {
 		log.Println(err)
+		data["error"] = err
 	}
 
 	f.RenderTemplates(w, r, data, "page.html")
