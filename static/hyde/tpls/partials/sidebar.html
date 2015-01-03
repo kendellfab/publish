@@ -1,0 +1,32 @@
+<div class="sidebar">
+  <div class="container sidebar-sticky">
+    <div class="sidebar-about">
+      <!-- <img src="http://www.gravatar.com/avatar/d55c1faa59c2d1319225704bdffabe0d.png?s=200" alt="gravatar"> -->
+      <img src="/img/publish.png">
+      <a href="/"><h1>{{ .payload.Config.SiteName }}</h1></a>
+      {{ with .payload.Config.Tagline }}
+        <p class="lead">{{ . }}</p>
+      {{ end }}
+    </div>
+
+    <ul class="sidebar-nav">
+      <!-- <li class="sidebar-nav-item"><a href="{{ .Site.BaseUrl }}/">Blog</a></li> -->
+      {{ range .payload.Pages }}
+      <li class="sidebar-nav-item"><a href="/{{ .Slug }}">{{ .Title }}</a></li>
+      {{ end }}
+      {{ range .payload.Categories }}
+      <li class="sidebar-nav-item"><a href="/category/{{ .Slug }}">{{ .Title }} ({{ .Count }})</a></li>
+      {{ end }}
+    </ul>
+
+    <ul class="sidebar-nav">
+      <li class="sidebar-nav-item"><a href="http://github.com/#">GitHub</a></li>
+      {{ with .Site.Params.linkedin }}<li class="sidebar-nav-item"><a href="{{ . }}">LinkedIn</a></li>{{ end }}
+      {{ with .Site.Params.googleplus }}<li class="sidebar-nav-item"><a href="{{ . }}">Google+</a></li>{{ end }}
+      {{ with .Site.Params.facebook }}<li class="sidebar-nav-item"><a href="{{ . }}">Facebook</a></li>{{ end }}
+      {{ with .Site.Params.twitter }}<li class="sidebar-nav-item"><a href="{{ . }}">Twitter</a></li>{{ end }}
+    </ul>
+
+    <p>Copyright &copy; {{ .Now.Format "2006" }}</p>
+  </div>
+</div>
