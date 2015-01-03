@@ -10,6 +10,7 @@ There are just a few things to know about data in publish to get started.  There
 - Time Series
 
 ## Pages with Data
+There is a small set of pages that will receive data from the backend.  This is a list of pages and the data available to the templates.
 
 ### Every Page
 - App Config

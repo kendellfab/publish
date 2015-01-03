@@ -2,6 +2,7 @@ package interfaces
 
 import (
 	"database/sql"
+	"fmt"
 	"github.com/kendellfab/publish/domain"
 	"log"
 	"strings"
@@ -9,11 +10,17 @@ import (
 )
 
 type DbPageRepo struct {
-	db *sql.DB
+	db    *sql.DB
+	cache *PageCache
 }
 
 func NewDbPageRepo(db *sql.DB) domain.PageRepo {
 	pageRepo := &DbPageRepo{db: db}
+	cache, err := NewPageCache(100)
+	if err != nil {
+		log.Fatal(err)
+	}
+	pageRepo.cache = cache
 	pageRepo.init()
 	return pageRepo
 }
@@ -53,6 +60,9 @@ func (repo *DbPageRepo) FindById(id string) (*domain.Page, error) {
 }
 
 func (repo *DbPageRepo) FindBySlug(slug string) (*domain.Page, error) {
+	if page, ok := repo.cache.Get(slug); ok {
+		return page, nil
+	}
 	raw := "SELECT id, title, slug, created, content, published FROM page WHERE slug = ?"
 	row := repo.db.QueryRow(raw, slug)
 	return repo.parseRow(row)
@@ -68,14 +78,63 @@ func (repo *DbPageRepo) FindAll() ([]*domain.Page, error) {
 	return pages, nil
 }
 
+func (repo *DbPageRepo) getPublishedIds() ([]string, error) {
+	sel := "SELECT slug FROM page WHERE published = 1;"
+	rows, qErr := repo.db.Query(sel)
+	if qErr != nil {
+		return nil, qErr
+	}
+	slugs := make([]string, 0)
+	rows.Next()
+	for {
+		var slug string
+		sErr := rows.Scan(&slug)
+		if sErr == nil {
+			slugs = append(slugs, slug)
+		}
+		if !rows.Next() {
+			break
+		}
+	}
+	return slugs, nil
+}
+
 func (repo *DbPageRepo) FindAllPublished() ([]*domain.Page, error) {
-	sql := "SELECT id, title, slug, created, content, published FROM page WHERE published = 1"
-	rows, qError := repo.db.Query(sql)
+	pages := make([]*domain.Page, 0)
+
+	slugs, err := repo.getPublishedIds()
+	faults := make([]interface{}, 0)
+	if err == nil {
+		for _, slug := range slugs {
+			if page, ok := repo.cache.Get(slug); ok {
+				pages = append(pages, page)
+			} else {
+				faults = append(faults, slug)
+			}
+		}
+	}
+
+	if len(faults) == 0 {
+		return pages, nil
+	}
+
+	var rows *sql.Rows
+	var qError error
+
+	if len(faults) == len(slugs) {
+		sel := "SELECT id, title, slug, created, content, published FROM page WHERE published = 1"
+		rows, qError = repo.db.Query(sel)
+	} else {
+		sel := "SELECT id, title, slug, created, content, published FROM page WHERE slug IN(%s);"
+		phs := fmt.Sprintf(sel, GetPlaceholders(faults))
+		rows, qError = repo.db.Query(phs, faults...)
+	}
+
 	if qError != nil {
 		return nil, qError
 	}
-	pages := repo.parseRows(rows)
-	return pages, nil
+	results := repo.parseRows(rows)
+	return append(pages, results...), nil
 }
 
 func (repo *DbPageRepo) Publish(id string) error {
@@ -111,6 +170,7 @@ func (repo *DbPageRepo) parseRows(rows *sql.Rows) []*domain.Page {
 			if published == 1 {
 				page.Published = true
 			}
+			repo.cache.Add(page.Slug, &page)
 			pages = append(pages, &page)
 		}
 		if !rows.Next() {
