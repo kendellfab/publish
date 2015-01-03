@@ -1,0 +1,20 @@
+{{ partial "head.html" . }}
+<div class="content container">
+{{ with .Post }}
+  <div class="post">
+    <h1>{{ .Title }}</h1>
+    <span class="post-date">{{ .Created.Format "Jan 2, 2006" }} {{ with .Category }}&middot; <a href="/category/{{ .Slug }}">{{ .Title }}</a>{{ end }}</span>
+    {{ rend_md .Content }}
+  </div>
+{{ else }}
+    <p>{{ .PostError }}</p>
+{{ end }}
+{{ with .series }}
+	<h3><a href="/series/{{ .Slug }}">{{ .Title }}</a></h3>
+	<hr />
+	{{ range .Posts }}
+		<p><a href="{{ .Permalink }}">{{ .Title }}</a></p>
+	{{ end }}
+{{ end }}
+</div>
+{{ partial "foot.html" . }}
