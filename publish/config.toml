@@ -2,7 +2,7 @@ port = 8181
 cache_tpls = false
 admin = "../static/admin"
 theme = "../static/hyde"
-upload = "/home/kendell/Desktop/uploads"
+upload = "../static/uploads"
 session = ["ADF@#$123Mdskoek"]
 
 [app]
