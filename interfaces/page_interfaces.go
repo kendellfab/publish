@@ -69,7 +69,7 @@ func (repo *DbPageRepo) FindBySlug(slug string) (*domain.Page, error) {
 }
 
 func (repo *DbPageRepo) FindAll() ([]*domain.Page, error) {
-	sql := "SELECT id, title, slug, created, content, published FROM page"
+	sql := "SELECT id, title, slug, created, content, published FROM page ORDER BY created DESC;"
 	rows, qError := repo.db.Query(sql)
 	if qError != nil {
 		return nil, qError

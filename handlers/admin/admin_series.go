@@ -25,6 +25,7 @@ func (a AdminSeries) RegisterRoutes(app *milo.Milo) {
 	app.Route("/admin/series", []string{"Get"}, a.authMid(a.handleSeries))
 	app.Route("/admin/series/{id}/edit", []string{"Get"}, a.authMid(a.handleSeriesEdit))
 	app.Route("/admin/series/{id}/edit", []string{"Post"}, a.authMid(a.handleSeriesUpdate))
+	app.Route("/admin/series/{id}/delete", []string{"Get", "Delete"}, a.authMid(a.handleSeriesDelete))
 	app.Route("/admin/series/start", []string{"Post"}, a.authMid(a.handleSeriesStart))
 }
 
@@ -85,4 +86,15 @@ func (a AdminSeries) handleSeriesStart(w http.ResponseWriter, r *http.Request) {
 	}
 
 	a.Redirect(w, r, fmt.Sprintf("/admin/series/%d/edit", series.Id), http.StatusSeeOther)
+}
+
+func (a AdminSeries) handleSeriesDelete(w http.ResponseWriter, r *http.Request) {
+	id := mux.Vars(r)["id"]
+	err := a.rm.SeriesRepo.Delete(id)
+	if err != nil {
+		a.setErrorFlash(w, r, err.Error())
+	} else {
+		a.setSuccessFlash(w, r, "Series deleted.")
+	}
+	a.Redirect(w, r, "/admin/series", http.StatusSeeOther)
 }

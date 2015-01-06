@@ -18,6 +18,7 @@ type SeriesRepo interface {
 	GetSeries(id string) (*Series, error)
 	GetSeriesWithSlug(slug string) (*Series, error)
 	Count() (int, error)
+	Delete(id string) error
 }
 
 type Series struct {

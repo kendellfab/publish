@@ -21,6 +21,15 @@
 
 		<div class="panel panel-default">
 			<div class="panel-heading">
+				<h3 class="panel-title">Delete</h3>
+			</div>
+			<div class="panel-body">
+				<a href="/admin/series/{{ .series.Id }}/delete" class="btn btn-danger full">Delete</a>
+			</div>
+        </div>
+
+		<div class="panel panel-default">
+			<div class="panel-heading">
 				<h3 class="panel-title">Posts</h3>
 			</div>
 			<div class="panel-body">

@@ -85,6 +85,12 @@ func (repo *DbSeriesRepo) GetSeriesWithSlug(slug string) (*domain.Series, error)
 	return repo.scanSingleSeries(row)
 }
 
+func (repo *DbSeriesRepo) Delete(id string) error {
+	del := "DELETE FROM series WHERE id = ?;"
+	_, err := repo.db.Exec(del, id)
+	return err
+}
+
 func (repo *DbSeriesRepo) scanSingleSeries(row *sql.Row) (*domain.Series, error) {
 	var s domain.Series
 	var created string
