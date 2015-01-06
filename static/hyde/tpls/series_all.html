@@ -15,7 +15,8 @@
 	    {{ end }}
 	  	</div>
   	{{ else }}
-		<p>No Posts</p>
+		<p>No Series</p>
   	{{ end }}
+	{{ if .pagination.HasOlder}}<a href="/series?page={{ .pagination.OlderIndex }}">Older</a>{{ end }} {{ if .pagination.Both }} &middot; {{ end }} {{ if .pagination.HasNewer }}<a href="/series?page={{ .pagination.NewerIndex }}">Newer</a>{{ end }}
 </div>
 {{ partial "foot.html" . }}

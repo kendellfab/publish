@@ -35,6 +35,17 @@ func (repo *DbSeriesRepo) Store(s *domain.Series) error {
 	return err
 }
 
+func (repo *DbSeriesRepo) Count() (int, error) {
+	sel := "SELECT count(*) FROM series;"
+	row := repo.db.QueryRow(sel)
+	var count int
+	sErr := row.Scan(&count)
+	if sErr != nil {
+		return 0, sErr
+	}
+	return count, nil
+}
+
 func (repo *DbSeriesRepo) Update(s *domain.Series) error {
 	up := "UPDATE series SET title=?, slug=?, created=?, description=? WHERE id = ?;"
 	_, err := repo.db.Exec(up, s.Title, s.Slug, s.Created.Format(time.RFC3339), s.Description, s.Id)
@@ -48,25 +59,16 @@ func (repo *DbSeriesRepo) GetAll() ([]*domain.Series, error) {
 		return nil, qErr
 	}
 
-	series := make([]*domain.Series, 0)
-	rows.Next()
-	for {
-		var s domain.Series
-		var created string
-		sErr := rows.Scan(&s.Id, &s.Title, &s.Slug, &created, &s.Description)
-		if sErr == nil {
-			s.Created, _ = time.Parse(time.RFC3339, created)
-			if posts, pErr := repo.postRepo.GetForSeries(fmt.Sprintf("%d", s.Id)); pErr == nil {
-				s.Posts = posts
-			}
-			series = append(series, &s)
-		}
-		if !rows.Next() {
-			break
-		}
-	}
+	return repo.scanSeries(rows), nil
+}
 
-	return series, nil
+func (repo *DbSeriesRepo) GetSeriesLimit(offset, limit int) ([]*domain.Series, error) {
+	sel := "SELECT id, title, slug, created, description FROM series ORDER BY created DESC LIMIT ? OFFSET ?;"
+	rows, qErr := repo.db.Query(sel, limit, offset)
+	if qErr != nil {
+		return nil, qErr
+	}
+	return repo.scanSeries(rows), nil
 }
 
 func (repo *DbSeriesRepo) GetSeries(id string) (*domain.Series, error) {
@@ -100,4 +102,25 @@ func (repo *DbSeriesRepo) scanSingleSeries(row *sql.Row) (*domain.Series, error)
 	}
 
 	return &s, nil
+}
+
+func (repo *DbSeriesRepo) scanSeries(rows *sql.Rows) []*domain.Series {
+	series := make([]*domain.Series, 0)
+	rows.Next()
+	for {
+		var s domain.Series
+		var created string
+		sErr := rows.Scan(&s.Id, &s.Title, &s.Slug, &created, &s.Description)
+		if sErr == nil {
+			s.Created, _ = time.Parse(time.RFC3339, created)
+			if posts, pErr := repo.postRepo.GetForSeries(fmt.Sprintf("%d", s.Id)); pErr == nil {
+				s.Posts = posts
+			}
+			series = append(series, &s)
+		}
+		if !rows.Next() {
+			break
+		}
+	}
+	return series
 }

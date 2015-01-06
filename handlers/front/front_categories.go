@@ -29,8 +29,14 @@ func (f FrontCategories) handleCategory(w http.ResponseWriter, r *http.Request) 
 	data := make(map[string]interface{})
 	cat, err := f.rm.CategoryRepo.FindBySlug(slug)
 	if err == nil {
+		total, _ := f.rm.PostRepo.PublishedCountCategory(cat.Id)
+		paginator := GetPagination(r, total, f.pageCount)
+		offset := paginator.Offset * paginator.Count
+		count := paginator.Count
+
 		data["category"] = cat
-		posts, pErr := f.rm.PostRepo.FindByCategory(cat, 0, 10)
+		data["pagination"] = paginator
+		posts, pErr := f.rm.PostRepo.FindByCategory(cat, offset, count)
 		if pErr == nil {
 			data["posts"] = posts
 		} else {

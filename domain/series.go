@@ -14,8 +14,10 @@ type SeriesRepo interface {
 	Store(s *Series) error
 	Update(s *Series) error
 	GetAll() ([]*Series, error)
+	GetSeriesLimit(offset, limit int) ([]*Series, error)
 	GetSeries(id string) (*Series, error)
 	GetSeriesWithSlug(slug string) (*Series, error)
+	Count() (int, error)
 }
 
 type Series struct {

@@ -22,9 +22,15 @@ func (f FrontSeries) RegisterRoutes(app *milo.Milo) {
 
 func (f FrontSeries) handleSeries(w http.ResponseWriter, r *http.Request) {
 	data := make(map[string]interface{})
-	series, sErr := f.rm.SeriesRepo.GetAll()
+
+	total, _ := f.rm.SeriesRepo.Count()
+	paginator := GetPagination(r, total, f.pageCount)
+	offset := paginator.Offset * paginator.Count
+
+	series, err := f.rm.SeriesRepo.GetSeriesLimit(offset, paginator.Count)
 	data["series"] = series
-	data["error"] = sErr
+	data["pagination"] = paginator
+	data["error"] = err
 	f.RenderTemplates(w, r, data, "series_all.html")
 }
 

@@ -14,5 +14,6 @@
 		    </div>
 	    {{ end }}
 	</div>
+	{{ if .pagination.HasOlder}}<a href="/category/{{ .category.Slug }}?page={{ .pagination.OlderIndex }}">Older</a>{{ end }} {{ if .pagination.Both }} &middot; {{ end }} {{ if .pagination.HasNewer }}<a href="/category/{{ .category.Slug }}?page={{ .pagination.NewerIndex }}">Newer</a>{{ end }}
 </div>
 {{ partial "foot.html" . }}
