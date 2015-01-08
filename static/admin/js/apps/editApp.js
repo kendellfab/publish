@@ -16,6 +16,12 @@ pubApp.controller("EditController", ["$scope", "res", function($scope, res) {
 		res.post.publish($scope.post, success, error);
 	};
 
+	$scope.doDelete = function(e) {
+		if(!confirm("Delete post?")) {
+			e.preventDefault();
+		}
+	}
+
 	function success(result) {
 		$scope.saving = false;
 	}

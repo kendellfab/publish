@@ -12,6 +12,12 @@ pubApp.controller('PageController', ['$scope', 'res', function($scope, res){
 		res.page.update($scope.page, success, error);
 	}
 
+	$scope.doDelete = function(e) {
+		if(!confirm("Delete page?")) {
+			e.preventDefault();
+		}
+	}
+
 	function success(result) {
 		$scope.saving = false;
 	}

@@ -31,7 +31,7 @@
 				<h3 class="panel-title">Delete</h3>
 			</div>
 			<div class="panel-body">
-				<a href="/admin/pages/{{ .page.Id }}/delete" class="btn btn-danger full">Delete</a>
+				<a ng-click="doDelete($event)" href="/admin/pages/{{ .page.Id }}/delete" class="btn btn-danger full">Delete</a>
 			</div>
         </div>
 	</div>

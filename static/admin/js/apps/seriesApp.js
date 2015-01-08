@@ -11,6 +11,12 @@ pubApp.controller("SeriesController", ["$scope", "res", function($scope, res) {
 		alert(index);
 	}
 
+	$scope.doDelete = function(e) {
+		if(!confirm("Delete series?")) {
+			e.preventDefault();
+		}
+	}
+
 	function success(result) {
 		$scope.saving = false;
 	}
