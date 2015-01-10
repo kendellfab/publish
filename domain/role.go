@@ -7,7 +7,7 @@ const (
 	Usr
 	_
 	_
-	_
+	Author
 	_
 	_
 	Admin
@@ -19,6 +19,8 @@ func (r Role) String() string {
 		return "Unknown"
 	case Usr:
 		return "User"
+	case Author:
+		return "Author"
 	case Admin:
 		return "Admin"
 	default:

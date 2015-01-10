@@ -80,18 +80,33 @@ func (repo *DbUserRepo) FindByEmail(email string) (*domain.User, error) {
 	return repo.scanRow(row)
 }
 
-func (repo *DbUserRepo) FindAdmin() (*[]domain.User, error) {
-	rows, rowError := repo.db.Query("SELECT id, name, email, salt, role FROM user WHERE role=?", domain.Admin)
+func (repo *DbUserRepo) FindAdmin() ([]domain.User, error) {
+	rows, rowError := repo.db.Query("SELECT id, name, email, role FROM user WHERE role=?", domain.Admin)
 	if rowError != nil {
 		return nil, rowError
 	}
 	users := repo.scanUsers(rows)
-	return &users, nil
+	return users, nil
+}
+
+func (repo *DbUserRepo) GetAll() ([]domain.User, error) {
+	rows, rowErr := repo.db.Query("SELECT id, name, email, role FROM user;")
+	if rowErr != nil {
+		return nil, rowErr
+	}
+	users := repo.scanUsers(rows)
+	return users, nil
 }
 
 func (repo *DbUserRepo) UpdatePassword(userId, password string) error {
 	up := "UPDATE user SET password = ? WHERE id = ?;"
 	_, err := repo.db.Exec(up, password, userId)
+	return err
+}
+
+func (repo *DbUserRepo) Delete(id string) error {
+	del := "DELETE FROM user WHERE id = ?;"
+	_, err := repo.db.Exec(del, id)
 	return err
 }
 
@@ -105,7 +120,6 @@ func (repo *DbUserRepo) scanRow(row *sql.Row) (*domain.User, error) {
 }
 
 func (repo *DbUserRepo) scanUsers(rows *sql.Rows) []domain.User {
-	fmt.Println("Scanning...")
 	users := make([]domain.User, 0)
 	for {
 		var user domain.User

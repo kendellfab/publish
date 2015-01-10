@@ -15,8 +15,10 @@ type UserRepo interface {
 	FindById(id string) (*User, error)
 	FindByIdInt(id int64) (*User, error)
 	FindByEmail(email string) (*User, error)
-	FindAdmin() (*[]User, error)
+	FindAdmin() ([]User, error)
 	UpdatePassword(userId, password string) error
+	GetAll() ([]User, error)
+	Delete(id string) error
 }
 
 type User struct {
@@ -47,8 +49,12 @@ func (u *User) HashEmail() {
 }
 
 func NewAdminUser(name, email, password string) (*User, error) {
+	return NewUser(name, email, password, Admin)
+}
+
+func NewUser(name, email, password string, role Role) (*User, error) {
 	if bArr, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost); err == nil {
-		usr := &User{Name: name, Email: email, Password: string(bArr), Role: Admin}
+		usr := &User{Name: name, Email: email, Password: string(bArr), Role: role}
 		usr.GenerateToken()
 		usr.HashEmail()
 		return usr, nil
