@@ -7,6 +7,7 @@ import (
 	"github.com/kendellfab/publish/domain"
 	"log"
 	"net/http"
+	"strconv"
 	"time"
 )
 
@@ -29,8 +30,15 @@ func (f FrontPosts) handleYear(w http.ResponseWriter, r *http.Request) {
 	year := mux.Vars(r)["year"]
 	now := time.Now()
 
+	start := int(now.Month())
+	if yr, yrErr := strconv.Atoi(year); yrErr == nil {
+		if yr != now.Year() {
+			start = 12
+		}
+	}
+
 	series := make([]*domain.TimeSeries, 0)
-	for i := int(now.Month()); i > 0; i-- {
+	for i := start; i > 0; i-- {
 		when, _ := time.Parse("2006-1", fmt.Sprintf("%s-%d", year, i))
 		if posts, pErr := f.rm.PostRepo.FindByYearMonth(year, fmt.Sprintf("%d", i)); pErr == nil {
 			series = append(series, &domain.TimeSeries{When: when, Posts: posts})
@@ -46,7 +54,7 @@ func (f FrontPosts) handleMonth(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	year := vars["year"]
 	month := vars["month"]
-	when, _ := time.Parse("2006-01", fmt.Sprintf("%s-%s", year, month))
+	when, _ := time.Parse("2006-1", fmt.Sprintf("%s-%s", year, month))
 
 	posts, pErr := f.rm.PostRepo.FindByYearMonth(year, month)
 	series := make([]*domain.TimeSeries, 0)
