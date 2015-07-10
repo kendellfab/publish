@@ -3,11 +3,12 @@
 package infrastructure
 
 import (
-	_ "code.google.com/p/go-sqlite/go1/sqlite3"
 	"database/sql"
 	"errors"
-	"github.com/kendellfab/publish/domain"
 	"log"
+
+	"github.com/kendellfab/publish/domain"
+	_ "github.com/mxk/go-sqlite/sqlite3"
 )
 
 func init() {

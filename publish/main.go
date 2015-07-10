@@ -2,6 +2,9 @@ package main
 
 import (
 	"flag"
+	"log"
+	"path/filepath"
+
 	"github.com/BurntSushi/toml"
 	"github.com/gorilla/sessions"
 	"github.com/kendellfab/milo"
@@ -11,8 +14,6 @@ import (
 	"github.com/kendellfab/publish/infrastructure"
 	"github.com/kendellfab/publish/interfaces"
 	"github.com/kendellfab/publish/usecases"
-	"log"
-	"path/filepath"
 )
 
 func main() {
